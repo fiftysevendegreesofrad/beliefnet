@@ -277,10 +277,12 @@ There is no hope for me!
 			}
 			function computeMinMaxLogProbs(cy)
 			{
-				if (false)
+				let combinations;
+				let recompute = false;
+				if (recompute)
 				{
 					let nodes = cy.nodes();
-					let combinations = getAllPredCombinations(nodes);
+					combinations = getAllPredCombinations(nodes);
 					result = [];
 					for (let i = 0;i<combinations.length;i++)
 					{
@@ -294,6 +296,12 @@ There is no hope for me!
 				//get min and max values from result
 				MINLOGPROB = Math.min(...result);
 				MAXLOGPROB = Math.max(...result);
+				if (recompute)
+				{
+					let maxIndex = result.indexOf(Math.max(...result));
+					console.log(combinations[maxIndex]);
+					console.log(MINLOGPROB,MAXLOGPROB);
+				}
 			}
 			document.addEventListener('DOMContentLoaded', async function(){
 
