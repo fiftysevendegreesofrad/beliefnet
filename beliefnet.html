@@ -6,7 +6,10 @@
 		<title>BeliefNet</title>
 
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
-
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	  
 		<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 
 		<!--polyfills are needed for this extension for old browsers like IE -->
@@ -17,6 +20,26 @@
 		<script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
 
 		<style>
+			    /* Set height of the header */
+				.header {
+		height: 50px;
+		background-color: #f1f1f1;
+		text-align: center;
+		line-height: 50px;
+		}
+
+    /* Set height of the left panel */
+    .left-panel {
+      height: 500px;
+      background-color: #aaa;
+    }
+
+    /* Set height of the right panel */
+    .right-panel {
+      height: 500px;
+      background-color: #bbb;
+    }
+
 			body {
 				font-family: helvetica;
 				font-size: 15px;
@@ -174,6 +197,14 @@ There is no hope for me!
 				}
 				return elements;
 			}
+			function predicateToIndex(node)
+			{
+				return (1-node.data("predicateValue"))*(node.data("options").length-1);
+			}
+			function getPredicateFromIndex(node, index)
+			{
+				return 1-index/(node.options.length-1);
+			}
 			function updateEdgePredValuesGetNodeLogProb(n)
 			{
 				let baseProb = n.data("baseProb");
@@ -189,11 +220,17 @@ There is no hope for me!
 				nodeLogOdds *= nodeCoeffValue;
 				return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
 			}
-			function updateTCD()
+			function computeBelievabilityFromLogLik(logLik)
 			{
-				var ll = updateLogLik(cy);
-				console.log(ll);
-				document.getElementById("loglik").innerHTML = -ll;
+				let believability = (logLik-MINLOGPROB)/(MAXLOGPROB-MINLOGPROB)*100;
+				//round to 1 decimal place
+				return Math.round(believability*10)/10;
+			}
+			function updateBelievabilityDisplay(cy)
+			{
+				let believability = computeBelievabilityFromLogLik(updateLogLik(cy));
+				console.log(believability);
+				document.getElementById("loglik").innerHTML = believability;
 				cy.resize();
 			}
 			function updateLogLik(cy)
@@ -208,13 +245,55 @@ There is no hope for me!
 				}
 				return logLik;
 			}
-			function altNetworkLogLik(cy,nodeID,nodePredValue)
+			function altNetworkLogLik(cy,nodesToChange)
 			{
 				let eles = cy.elements().map(x=>x.json());
 				let cyClone = cytoscape({elements: eles, headless: true});
-				let n = cyClone.getElementById(nodeID);
-				n.data("predicateValue",nodePredValue);
+				for (let [nodeID, nodePredValue] of Object.entries(nodesToChange))
+					cyClone.getElementById(nodeID).data("predicateValue",nodePredValue);
 				return updateLogLik(cyClone);
+			}
+			function getAllPredCombinations(nodes)
+			{
+				//recurse through all possible node predicate values
+				let head = nodes[0];
+				let tail = nodes.slice(1);
+				let options = head.data("options");
+				let optionsPredValues = [];
+				for (let i=0; i<options.length; i++)
+					optionsPredValues.push(getPredicateFromIndex(head.data(), i));
+
+				let tailCombinations;
+				if (tail.length>0)
+					tailCombinations = getAllPredCombinations(tail);
+				else
+					tailCombinations = [[]];
+
+				let result = [];
+				for (optionIndex of optionsPredValues)
+					for (tailCombination of tailCombinations)
+						result.push([optionIndex].concat(tailCombination));
+				return result;
+			}
+			function computeMinMaxLogProbs(cy)
+			{
+				if (false)
+				{
+					let nodes = cy.nodes();
+					let combinations = getAllPredCombinations(nodes);
+					result = [];
+					for (let i = 0;i<combinations.length;i++)
+					{
+						let nodesToChange = {};
+						for (let j=0;j<nodes.length;j++)
+							nodesToChange[nodes[j].id()] = combinations[i][j];
+						result.push(altNetworkLogLik(cy,nodesToChange));
+					}
+				}
+				else result=[-80.47512266156517,-0.32923266463987577];
+				//get min and max values from result
+				MINLOGPROB = Math.min(...result);
+				MAXLOGPROB = Math.max(...result);
 			}
 			document.addEventListener('DOMContentLoaded', async function(){
 
@@ -298,15 +377,9 @@ There is no hope for me!
 					userPanningEnabled: false
 				});
 				updateLogLik(cy); //call to initialize node logprobs
-				updateTCD();
-				function predicateToIndex(node)
-				{
-					return (1-node.data("predicateValue"))*(node.data("options").length-1);
-				}
-				function getPredicateFromIndex(node, index)
-				{
-					return 1-index/(node.options.length-1);
-				}
+				computeMinMaxLogProbs(cy);
+				updateBelievabilityDisplay(cy);
+
 				cy.bind('click', 'node', function(evt) {
 					//create radio buttons from options
 					let node = evt.target;
@@ -324,20 +397,22 @@ There is no hope for me!
 						radio.checked = (i==whichSelected)?"checked":"";
 						let debugmessage = options[i];
 						let radioPredValue = getPredicateFromIndex(node.data(), i);
-						let resultingTCD = (-altNetworkLogLik(cy,node.id(),radioPredValue));
-						let enabled = resultingTCD<6.1;
+						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:radioPredValue}));
+						let minBelievability = computeBelievabilityFromLogLik(-6.1);
+						console.log("minbelievability="+minBelievability);
+						let enabled = resultingBelievability>minBelievability;
 						radio.disabled = !enabled;
 						if (enabled)
 						{
 							radio.addEventListener("click", function(evt1){
 								node.data("predicateValue",radioPredValue); 
 								console.log(debugmessage);
-								updateTCD();
+								updateBelievabilityDisplay(cy);
 							});
 						}
 						let label = document.createElement("label");
-						let toohigh = enabled?"":", too high";
-						label.innerHTML = options[i]+" (resulting unbelievability="+resultingTCD+toohigh+")";
+						let tooLow = enabled?"":", too low";
+						label.innerHTML = options[i]+" (resulting believability="+resultingBelievability+tooLow+")";
 						label.htmlFor = "radio"+i;
 						document.getElementById("nodeDetails").appendChild(radio);
 						document.getElementById("nodeDetails").appendChild(label);
@@ -351,13 +426,22 @@ There is no hope for me!
 	</head>
 
 	<body>
-		<h1>The web below represents the belief system of Subject Zero. Your task, on behalf of Eris and all discordia, is to make them believe in the Reptilian Elite.</h1>
-		<h1>Narrative Unbelievability: <span id="loglik"/></h1>
-		<h1 id="nodeDetails"></h1>
+		<div class="header">
+			<h1>Narrative Believability: <span id="loglik"/></h1>
+		</div>
 		
-		<div id="cy"></div>
-		Topic colour shows belief. Pie slices show the intrinsic believability of each topic. On top of that, the believability of each topic is affected by other topics, as shown by the arrows.
-		Topic size shows unbelievability associated with the current belief.
+		  <!-- Panels -->
+		  <div class="row">
+			<div class="col-sm-6 left-panel">
+				<div id="cy"></div>
+			</div>
+			<div class="col-sm-6 right-panel">
+				<h1 id="nodeDetails"></h1>
+			</div>
+		  </div>
+
+		
+		
 	</body>
 
 </html>
