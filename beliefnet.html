@@ -1,0 +1,363 @@
+<!DOCTYPE>
+
+<html>
+
+	<head>
+		<title>BeliefNet</title>
+
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+		<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+		<!--polyfills are needed for this extension for old browsers like IE -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.5.7/shim.min.js"></script>
+
+		<script src="https://unpkg.com/layout-base/layout-base.js"></script>
+		<script src="https://unpkg.com/avsdf-base/avsdf-base.js"></script>
+		<script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
+
+		<style>
+			body {
+				font-family: helvetica;
+				font-size: 15px;
+			}
+
+			#cy {
+				width: 100%;
+				height: 90%;
+				z-index: 999;
+			}
+
+			h1 {
+				opacity: 0.5;
+				font-size: 1em;
+				font-weight: bold;
+			}
+
+			button {
+				font-size: 15px;
+				margin-right: 10px;
+			}
+
+			.line {
+				clear:left;
+				height:25px;
+				margin-top:6px;
+				margin-right:6px;
+				margin-bottom:6px;
+			}
+
+			.radio {
+				margin-left:25px;
+			}
+
+		</style>
+
+		<script>
+			async function load_elements()
+			{
+				//let response = await fetch(new Request(filename));
+				//let text = await response.text();
+				let text=`
+REPTILES 0.01: Reptilian Elite
+The world is governed by a secret elite of literal reptiles - actual lizard people
+The world is governed by humans
++5 QANON
++5 GOVERNMENTS
++5 CHEMTRAILS
++5 BIRDS
+-10 HOPE
+
+QANON 0.05: QAnon
+Donald Trump's primary struggle is to fight against Satan worshipping paedophiles
+Donald Trump's primary struggle is that he is Donald Trump
++5 CHEMTRAILS
++5 GOVERNMENTS
+
+GOVERNMENTS 0.2: Governments
+Governments are the tools of a secret evil world order
+Governments are no more competent or moral than the rest of us 
+Governments can be trusted 
++5 COMPETENT
++1 PHARMA
+
+BIRDS 0.01: Birds
+All birds have been replaced with robot surveillance drones
+Birds are just birds
++5 GOVERNMENTS
++5 FIVEG
+
+FIVEG 0.05: 5G
+Disease is caused by 5G phone masts
+Disease is caused by germs, viruses, etc
++5 CHEMTRAILS
++5 GOVERNMENTS
+-5 HOPE
+
+CHEMTRAILS 0.1: Chemtrails
+Trails left behind jets are chemtrails used for mind control
+Trails left behind jets are condensed water called contrails
++5 PHARMA
++5 GOVERNMENTS
+-5 HOPE
+
+PHARMA 0.5: Big Pharma
+Big pharma is the tool of a secret world order
+Big pharma does not always act in the interests of the patient 
+Large medical research corporations are trustworthy
++1 IBSCURE
++5 HOMEOPATHY
+
+HOMEOPATHY 0.3: Homeopathy
+Homeopathy definitely works
+Science has proven nothing about homeopathy, but one day it might
+Homeopathy is indistinguishable from placebo, we're done here
++5 IBSCURE
+
+COMPETENT 0.5: I got fired 
+I got fired because the elite are trying to suppress me 
+I got fired because my manager was incompetent
+I got fired because I am incompetent 
++5 HOPE
+
+IBSCURE 0.5: Irritable Bowel Syndrome 
+My IBS can be cured
+...well, maybe. I dunno.
+My IBS is incurable
++5 HOPE
++5 HOMEOPATHY
+
+HOPE 0.9: Hope
+There is hope for me! 
+There is no hope for me!
+
+`
+				let lines = text.split("\n");
+				let elements = {nodes: [], edges: []};
+				
+				while (lines.length > 0)
+				{
+					let line = lines.shift();
+					if (line.trim()=="") continue;
+
+					//expecting node line
+					let parts = line.split(":");
+					let leftparts = parts[0].split(" ");
+					let nodeLabel = leftparts[0].trim();
+					let baseProb = parseFloat(leftparts[1]);
+					let userLabel = parts[1].trim();
+
+					let options=[]
+					line = lines.shift();
+					while (true)
+					{
+						if (line.trim()=="")
+							break; //end of node
+						if (line[0]=="+" || line[0]=="-")
+							break; //that will be an edge
+						options.push(line);
+						line = lines.shift();
+					}
+					elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabel, baseProb: baseProb, options: options,
+						predicateValue: 0, logprob: 0}});
+
+					//now we are expecting edges
+					while(line.trim()!="")
+					{
+						let parts = line.split(" ");
+						let weight = parseFloat(parts[0]);
+						let source = parts[1].trim();
+						elements.edges.push({data: {source: source, target: nodeLabel, weight: weight, absweight: Math.abs(weight), 
+							directed: true, sourcePredValue:0}});
+						line = lines.shift();
+					}
+				}
+				return elements;
+			}
+			function updateEdgePredValuesGetNodeLogProb(n)
+			{
+				let baseProb = n.data("baseProb");
+				let nodeLogOdds = Math.log(baseProb/(1-baseProb));
+				for (e of n.incomers("edge"))
+				{
+					let sourcePredValue = e.source().data("predicateValue");
+					e.data("sourcePredValue",sourcePredValue);
+					let coeffValue = sourcePredValue*2-1;
+					nodeLogOdds += coeffValue*e.data("weight");
+				}
+				let nodeCoeffValue = n.data("predicateValue")*2-1;
+				nodeLogOdds *= nodeCoeffValue;
+				return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
+			}
+			function updateTCD()
+			{
+				var ll = updateLogLik(cy);
+				console.log(ll);
+				document.getElementById("loglik").innerHTML = -ll;
+				cy.resize();
+			}
+			function updateLogLik(cy)
+			{
+				let logLik = 0;
+				for (n of cy.nodes())
+				{
+					let logProb = updateEdgePredValuesGetNodeLogProb(n);
+					n.data("logprob",logProb);
+					n.data("displaylabel",n.data("label")+" "+logProb.toFixed(3));
+					logLik += logProb;
+				}
+				return logLik;
+			}
+			function altNetworkLogLik(cy,nodeID,nodePredValue)
+			{
+				let eles = cy.elements().map(x=>x.json());
+				let cyClone = cytoscape({elements: eles, headless: true});
+				let n = cyClone.getElementById(nodeID);
+				n.data("predicateValue",nodePredValue);
+				return updateLogLik(cyClone);
+			}
+			document.addEventListener('DOMContentLoaded', async function(){
+
+				let elements = await load_elements();
+				
+				var cy = window.cy = cytoscape({
+					container: document.getElementById('cy'),
+
+					layout: {
+						name: 'avsdf',
+						nodeSeparation: 120,
+						animate: "end",
+						animationDuration: 1000,
+						animationEasing: 'ease-in-out',
+						nodeSeparation: 120
+					},
+
+					style: [
+						{
+							selector: 'node',
+							style: {
+								'label': 'data(displaylabel)',
+								'text-valign': 'center',
+								'color': '#000000',
+								'width': 'mapData(logprob,-6,0,50,20)',
+								'height': 'mapData(logprob,-6,0,50,20)',
+								'pie-1-background-color':'mapData(predicateValue, 0, 1, blue, red)',
+								'pie-1-background-size':'mapData(baseProb,0,1,0,100)',
+								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaaa)',
+								'pie-2-background-size':'mapData(baseProb,0,1,100,0)'
+							}
+						},
+						{
+							selector: 'node[predicateValue=0.5]',
+							style: {
+								'pie-1-background-color':'#444444',
+								'pie-2-background-color':'#aaaaaa',
+							}
+						},
+						
+						{
+							selector: 'edge',
+							style: {
+								'width': 'mapData(absweight, 0, 5, 0, 7)',
+								'line-color': 'mapData(sourcePredValue, 0, 1, blue, red)',
+								'opacity': 0.5,
+								'target-arrow-shape': 'triangle',
+								'target-arrow-color': 'mapData(sourcePredValue, 0, 1, blue, red)',
+								'curve-style': 'bezier'
+							}
+						},
+						{
+							selector: 'edge[weight<0][sourcePredValue=0]',
+							style: {
+								'line-fill':'linear-gradient',
+								'line-gradient-stop-colors':'blue red',
+								'target-arrow-color': 'red'
+							}
+						},
+						{
+							selector: 'edge[weight<0][sourcePredValue=1]',
+							style: {
+								'line-fill':'linear-gradient',
+								'line-gradient-stop-colors':'red blue',
+								'target-arrow-color': 'blue'
+							}
+						},
+						{
+							selector: 'edge[sourcePredValue=0.5]',
+							style: {
+								'line-color':'grey',
+								'target-arrow-color': 'grey'
+							}
+						}
+					],
+
+					elements: elements,
+					autounselectify: true,
+					autoungrabify: true,
+					userZoomingEnabled: false,
+					userPanningEnabled: false
+				});
+				updateLogLik(cy); //call to initialize node logprobs
+				updateTCD();
+				function predicateToIndex(node)
+				{
+					return (1-node.data("predicateValue"))*(node.data("options").length-1);
+				}
+				function getPredicateFromIndex(node, index)
+				{
+					return 1-index/(node.options.length-1);
+				}
+				cy.bind('click', 'node', function(evt) {
+					//create radio buttons from options
+					let node = evt.target;
+					let options = evt.target.data().options;
+					let whichSelected = predicateToIndex(evt.target);
+					document.getElementById("nodeDetails").innerHTML="";
+					for (let i=0; i<options.length; i++)
+					{
+						let radio = document.createElement("input");
+						radio.type = "radio";
+						radio.name = "radio";
+						radio.id = "radio"+i;
+						radio.className = "radio";
+						radio.value = i;
+						radio.checked = (i==whichSelected)?"checked":"";
+						let debugmessage = options[i];
+						let radioPredValue = getPredicateFromIndex(node.data(), i);
+						let resultingTCD = (-altNetworkLogLik(cy,node.id(),radioPredValue));
+						let enabled = resultingTCD<6.1;
+						radio.disabled = !enabled;
+						if (enabled)
+						{
+							radio.addEventListener("click", function(evt1){
+								node.data("predicateValue",radioPredValue); 
+								console.log(debugmessage);
+								updateTCD();
+							});
+						}
+						let label = document.createElement("label");
+						let toohigh = enabled?"":", too high";
+						label.innerHTML = options[i]+" (resulting unbelievability="+resultingTCD+toohigh+")";
+						label.htmlFor = "radio"+i;
+						document.getElementById("nodeDetails").appendChild(radio);
+						document.getElementById("nodeDetails").appendChild(label);
+						document.getElementById("nodeDetails").appendChild(document.createElement("br"));
+					}
+					cy.resize();
+				});
+
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>The web below represents the belief system of Subject Zero. Your task, on behalf of Eris and all discordia, is to make them believe in the Reptilian Elite.</h1>
+		<h1>Narrative Unbelievability: <span id="loglik"/></h1>
+		<h1 id="nodeDetails"></h1>
+		
+		<div id="cy"></div>
+		Topic colour shows belief. Pie slices show the intrinsic believability of each topic. On top of that, the believability of each topic is affected by other topics, as shown by the arrows.
+		Topic size shows unbelievability associated with the current belief.
+	</body>
+
+</html>
