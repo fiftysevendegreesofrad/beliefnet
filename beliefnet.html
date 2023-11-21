@@ -30,13 +30,13 @@
 
     /* Set height of the left panel */
     .left-panel {
-      height: 500px;
+      /*height: 500px;*/
       background-color: #aaa;
     }
 
     /* Set height of the right panel */
     .right-panel {
-      height: 500px;
+      /*height: 500px;*/
       background-color: #bbb;
     }
 
@@ -47,8 +47,15 @@
 
 			#cy {
 				width: 100%;
-				height: 90%;
+				height: 100%;
+				margin: 0 auto; /* Add this line to center the graph horizontally */
+				display: block;
+				justify-content: center; /* Add this line to center the graph horizontally */
+				align-items: center; /* Add this line to center the graph vertically */
 				z-index: 999;
+				padding: 10%;
+				box-sizing: border-box; /* Include padding in the total width and height */
+  				overflow: visible; /* Prevent content from overflowing outside the container */
 			}
 
 			h1 {
@@ -77,6 +84,9 @@
 		</style>
 
 		<script>
+			let MINLOGPROB,MAXLOGPROB;
+			let narrative = [];
+
 			async function load_elements()
 			{
 				//let response = await fetch(new Request(filename));
@@ -403,7 +413,7 @@ There is no hope for me!
 						radio.className = "radio";
 						radio.value = i;
 						radio.checked = (i==whichSelected)?"checked":"";
-						let debugmessage = options[i];
+						let narrativeMessage = options[i];
 						let radioPredValue = getPredicateFromIndex(node.data(), i);
 						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:radioPredValue}));
 						let minBelievability = computeBelievabilityFromLogLik(-6.1);
@@ -414,7 +424,8 @@ There is no hope for me!
 						{
 							radio.addEventListener("click", function(evt1){
 								node.data("predicateValue",radioPredValue); 
-								console.log(debugmessage);
+								console.log(narrativeMessage);
+								document.getElementById("narrative").innerHTML += narrativeMessage+" ("+resultingBelievability+")<br>";
 								updateBelievabilityDisplay(cy);
 							});
 						}
@@ -426,8 +437,9 @@ There is no hope for me!
 						document.getElementById("nodeDetails").appendChild(label);
 						document.getElementById("nodeDetails").appendChild(document.createElement("br"));
 					}
-					cy.resize();
+
 				});
+
 
 			});
 		</script>
@@ -440,11 +452,15 @@ There is no hope for me!
 		
 		  <!-- Panels -->
 		  <div class="row">
-			<div class="col-sm-6 left-panel">
+			<div class="col-sm-3 left-panel">
+				<h1 id="nodeDetails"></h1>
+			</div>
+			<div class="col-sm-6">
 				<div id="cy"></div>
 			</div>
-			<div class="col-sm-6 right-panel">
-				<h1 id="nodeDetails"></h1>
+			<div class="col-sm-3 right-panel">
+				<h1>Narrative</h1>
+				<div id="narrative"></div>
 			</div>
 		  </div>
 
