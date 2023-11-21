@@ -192,7 +192,7 @@ There is no hope for me!
 						line = lines.shift();
 					}
 					elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabel, baseProb: baseProb, options: options,
-						predicateValue: 0, logprob: 0}});
+						predicateValue: 0, logprob: 0, researched: false}});
 
 					//now we are expecting edges
 					while(line.trim()!="")
@@ -242,6 +242,17 @@ There is no hope for me!
 				console.log(believability);
 				document.getElementById("loglik").innerHTML = believability;
 				cy.resize();
+			}
+			function updateNarrativeDisplay()
+			{
+				html = "";
+				for (let i=0;i<narrative.length;i++)
+				{
+					let message = narrative[i].message;
+					let undo = narrative[i].undo;
+					html += "<div class='line'><button onclick='revert("+undo+")'>Undo</button>"+message+"</div>";
+				}
+				document.getElementById("narrative").innerHTML = html;
 			}
 			function updateLogLik(cy)
 			{
@@ -341,7 +352,8 @@ There is no hope for me!
 								'pie-1-background-color':'mapData(predicateValue, 0, 1, blue, red)',
 								'pie-1-background-size':'mapData(baseProb,0,1,0,100)',
 								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaaa)',
-								'pie-2-background-size':'mapData(baseProb,0,1,100,0)'
+								'pie-2-background-size':'mapData(baseProb,0,1,100,0)',
+								'display':'none'
 							}
 						},
 						{
@@ -394,16 +406,33 @@ There is no hope for me!
 					userZoomingEnabled: false,
 					userPanningEnabled: false
 				});
+				cy.nodes().first().style("display","element");
 				updateLogLik(cy); //call to initialize node logprobs
 				computeMinMaxLogProbs(cy);
 				updateBelievabilityDisplay(cy);
 
 				cy.bind('click', 'node', function(evt) {
-					//create radio buttons from options
 					let node = evt.target;
-					let options = evt.target.data().options;
+					//create research button
+					document.getElementById("ResearchButton").innerHTML="";
+					if (!node.data("researched"))
+					{
+						let button = document.createElement("button");
+						button.innerHTML = "Research";
+						button.addEventListener("click", function(evt1){
+							node.data("researched",true);
+							button.parentNode.removeChild(button);
+							//iterate through neighbouring nodes
+							for (n of node.openNeighborhood("node"))
+								n.style("display","element");
+						});
+						document.getElementById("ResearchButton").appendChild(button);
+					}
+					//create radio buttons from options
+					let options = node.data().options;
 					let whichSelected = predicateToIndex(evt.target);
 					document.getElementById("nodeDetails").innerHTML="";
+					let prevNodeValues = cy.elements().map(x=>x.json());
 					for (let i=0; i<options.length; i++)
 					{
 						let radio = document.createElement("input");
@@ -425,8 +454,9 @@ There is no hope for me!
 							radio.addEventListener("click", function(evt1){
 								node.data("predicateValue",radioPredValue); 
 								console.log(narrativeMessage);
-								document.getElementById("narrative").innerHTML += narrativeMessage+" ("+resultingBelievability+")<br>";
+								narrative.push({message:narrativeMessage, undo:prevNodeValues});
 								updateBelievabilityDisplay(cy);
+								updateNarrativeDisplay();
 							});
 						}
 						let label = document.createElement("label");
@@ -437,6 +467,7 @@ There is no hope for me!
 						document.getElementById("nodeDetails").appendChild(label);
 						document.getElementById("nodeDetails").appendChild(document.createElement("br"));
 					}
+				
 
 				});
 
@@ -453,6 +484,7 @@ There is no hope for me!
 		  <!-- Panels -->
 		  <div class="row">
 			<div class="col-sm-3 left-panel">
+				<div id="ResearchButton"></div>
 				<h1 id="nodeDetails"></h1>
 			</div>
 			<div class="col-sm-6">
