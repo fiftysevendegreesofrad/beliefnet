@@ -219,7 +219,7 @@ There is no hope for me!
 						let weight = parseFloat(parts[0]);
 						let source = parts[1].trim();
 						elements.edges.push({data: {source: source, target: nodeLabel, weight: weight, absweight: Math.abs(weight), 
-							directed: true, sourcePredValue:0}});
+							directed: true, color:'grey'}});
 						line = lines.shift();
 					}
 				}
@@ -237,14 +237,20 @@ There is no hope for me!
 			{
 				let baseProb = n.data("baseProb");
 				let nodeLogOdds = Math.log(baseProb/(1-baseProb));
+				let nodeCoeffValue = n.data("predicateValue")*2-1;
 				for (e of n.incomers("edge"))
 				{
 					let sourcePredValue = e.source().data("predicateValue");
-					e.data("sourcePredValue",sourcePredValue);
-					let coeffValue = sourcePredValue*2-1;
-					nodeLogOdds += coeffValue*e.data("weight");
+					let incomingCoeffValue = sourcePredValue*2-1;
+					nodeLogOdds += incomingCoeffValue*e.data("weight");
+					let nodeMutualSupport = incomingCoeffValue*nodeCoeffValue*Math.sign(e.data("weight"));
+					if (nodeMutualSupport>0)
+						e.data("color","green");
+					else if (nodeMutualSupport<0)
+						e.data("color","red");
+					else
+						e.data("color","grey");
 				}
-				let nodeCoeffValue = n.data("predicateValue")*2-1;
 				nodeLogOdds *= nodeCoeffValue;
 				return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
 			}
@@ -279,7 +285,7 @@ There is no hope for me!
 				{
 					let logProb = updateEdgePredValuesGetNodeLogProb(n);
 					n.data("logprob",logProb);
-					n.data("displaylabel",n.data("label")+" "+logProb.toFixed(3));
+					n.data("displaylabel",n.data("label"));
 					logLik += logProb;
 				}
 				return logLik;
@@ -372,11 +378,9 @@ There is no hope for me!
 								'label': 'data(displaylabel)',
 								'text-valign': 'center',
 								'color': '#000000',
-								'width': 'mapData(logprob,-6,0,50,20)',
-								'height': 'mapData(logprob,-6,0,50,20)',
-								'pie-1-background-color':'mapData(predicateValue, 0, 1, blue, red)',
+								'pie-1-background-color':'mapData(predicateValue, 0, 1, blue, purple)',
 								'pie-1-background-size':'mapData(baseProb,0,1,0,100)',
-								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaaa)',
+								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
 								'pie-2-background-size':'mapData(baseProb,0,1,100,0)',
 								'display':'none'
 							}
@@ -393,34 +397,11 @@ There is no hope for me!
 							selector: 'edge',
 							style: {
 								'width': 'mapData(absweight, 0, 5, 0, 7)',
-								'line-color': 'mapData(sourcePredValue, 0, 1, blue, red)',
+								'line-color': 'data(color)',
 								'opacity': 0.5,
 								'target-arrow-shape': 'triangle',
-								'target-arrow-color': 'mapData(sourcePredValue, 0, 1, blue, red)',
+								'target-arrow-color': 'data(color)',
 								'curve-style': 'bezier'
-							}
-						},
-						{
-							selector: 'edge[weight<0][sourcePredValue=0]',
-							style: {
-								'line-fill':'linear-gradient',
-								'line-gradient-stop-colors':'blue red',
-								'target-arrow-color': 'red'
-							}
-						},
-						{
-							selector: 'edge[weight<0][sourcePredValue=1]',
-							style: {
-								'line-fill':'linear-gradient',
-								'line-gradient-stop-colors':'red blue',
-								'target-arrow-color': 'blue'
-							}
-						},
-						{
-							selector: 'edge[sourcePredValue=0.5]',
-							style: {
-								'line-color':'grey',
-								'target-arrow-color': 'grey'
 							}
 						}
 					],
@@ -467,20 +448,28 @@ There is no hope for me!
 					}
 					else
 					{
-						let p = document.createElement("p");
+						let p = document.createElement("ul");
+
 						for (n of node.openNeighborhood("node"))
-							p.innerHTML += n.data("displaylabel")+"<br>";
+						{
+							let weight = node.edgesWith(n).data("weight");
+							if (weight>0) weight = "+"+weight;
+							p.innerHTML += "<li>"+weight+": "+n.data("displaylabel")+"</li>";
+						}
 						document.getElementById("ResearchButton").appendChild(p);
 					}
 					//create buttons for other options
 					document.getElementById("nodeDetails").innerHTML="";
 					let prevNodeValues = cy.elements().map(x=>x.json()); //for undo not yet implemented
+					let table = document.createElement("table");
 					for (let i=0; i<options.length; i++)
 					{
 						if (i==whichSelected) continue;
 
-						let optionPara = document.createElement("p");
-						optionPara.innerHTML = options[i];
+						let row = document.createElement("tr");
+
+						let optionSpan = document.createElement("span");
+						optionSpan.innerHTML = options[i];
 
 						let button = document.createElement("button");
 						let buttonPredValue = getPredicateFromIndex(node.data(), i);
@@ -524,10 +513,15 @@ There is no hope for me!
 							});
 						}
 
-						document.getElementById("nodeDetails").appendChild(optionPara);
-						document.getElementById("nodeDetails").appendChild(button);
-						document.getElementById("nodeDetails").appendChild(document.createElement("br"));
+						let td = document.createElement("td");
+						td.appendChild(button);
+						row.appendChild(td);
+						let td2 = document.createElement("td");
+						td2.appendChild(optionSpan);
+						row.appendChild(td2);
+						table.appendChild(row);
 					}
+					document.getElementById("nodeDetails").appendChild(table);
 				}
 
 
@@ -544,11 +538,13 @@ There is no hope for me!
 		<div class="row">
 		<div class="col-sm-3 left-panel">
 			<h1 id="topic"></h1>
-			<h2>Current Belief:</h2>
-			<p id="currentBelief"></p>
+			<h2>Subject's Current Belief:</h2>
+			<ul>
+			<li id="currentBelief"></li>
+			</ul>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
-			<h2>Related Beliefs:</h2>
+			<h2>Subject's Related Beliefs:</h2>
 			<div id="ResearchButton"></div>
 		</div>
 		<div class="col-sm-6">
