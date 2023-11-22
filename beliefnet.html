@@ -40,16 +40,37 @@
 					document.getElementById("loglik").innerHTML += " "+logLik.toFixed(2);
 				cy.resize();
 			}
+			function stringListToTableRow(list) {
+				let row = document.createElement("tr");
+
+				for (let i = 0; i < list.length; i++) {
+					let cell = document.createElement("td");
+					cell.innerHTML = list[i];
+					row.appendChild(cell);
+				}
+				return row;
+			}
 			function updateNarrativeDisplay()
 			{
-				html = "";
+				let table = document.createElement("table");
+
 				for (let i=0;i<narrative.length;i++)
 				{
 					let message = narrative[i].message;
 					let undo = narrative[i].undo;
-					html += "<div class='line'><button onclick='revert("+undo+")'>Undo</button>"+message+"</div>";
+					let logLik = narrative[i].logLik;
+					let prevLogLik = narrative[i].prevLogLik;
+					let llDiff = (logLik-prevLogLik).toFixed(2);
+					if (llDiff>=0)
+						llDiff = "+"+llDiff;
+
+					let row = stringListToTableRow(["<button onclick='revert(" + undo + ")'>Undo</button>",
+						logLik.toFixed(2), "("+llDiff+")", message]);
+						
+					table.appendChild(row);				
 				}
-				document.getElementById("narrative").innerHTML = html;
+				document.getElementById("narrative").innerHTML = "";
+				document.getElementById("narrative").appendChild(table);
 			}
 			function updateGraphDisplay(cy)
 			{
@@ -226,6 +247,7 @@
 						let buttonPredValue = getPredicateFromIndex(node.data(), i);
 						button.innerHTML = "Influence";
 
+						let currentLogLik = updateLogLik(cy);
 						let resultingLogLik = altNetworkLogLik(cy,{[node.id()]:buttonPredValue});
 						let resultingBelievability = computeBelievabilityFromLogLik(resultingLogLik);
 						
@@ -240,7 +262,8 @@
 							}
 							button.addEventListener("click", function(evt1){
 								node.data("predicateValue",buttonPredValue); 
-								narrative.push({message:options[i], undo:prevNodeValues});
+								narrative.push({message:options[i], 
+									logLik:resultingLogLik, prevLogLik:currentLogLik, undo:prevNodeValues});
 								updateBelievabilityDisplay(cy);
 								updateNarrativeDisplay();
 								refreshNodeDetails(node);

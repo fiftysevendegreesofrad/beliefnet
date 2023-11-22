@@ -18,29 +18,13 @@ function computeNodeMutualSupport(n1, n2) {
     let weight = n1.edgesWith(n2).data("weight");
     return nodeCoeffValue(n1) * nodeCoeffValue(n2) * weight;
 }
-function OLDupdateEdgePredValuesGetNodeLogProb(n)
-{
-    let baseProb = n.data("baseProb");
-    let nodeLogOdds = Math.log(baseProb/(1-baseProb));
-    let nodeCoeffValue = n.data("predicateValue")*2-1;
-    for (e of n.incomers("edge"))
-    {
-        let sourcePredValue = e.source().data("predicateValue");
-        let incomingCoeffValue = sourcePredValue*2-1;
-        nodeLogOdds += incomingCoeffValue*e.data("weight");
-    }
-    nodeLogOdds *= nodeCoeffValue;
-    return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
-}
 function updateEdgeColoursGetNodeLogProb(n) {
     let baseProb = n.data("baseProb");
     let nodeLogOdds = Math.log(baseProb / (1 - baseProb))*nodeCoeffValue(n);
 
-    console.log("baseprob", baseProb, "logodds", nodeLogOdds);
     for (e of n.incomers("edge")) {
         let nodeMutualSupport = computeNodeMutualSupport(n, e.source());
         nodeLogOdds += nodeMutualSupport;
-        console.log("mutual support", nodeMutualSupport, "for edge", e.source().data("displaylabel"));
         if (nodeMutualSupport > 0)
             e.data("color", "green");
         else if (nodeMutualSupport < 0)
@@ -49,15 +33,22 @@ function updateEdgeColoursGetNodeLogProb(n) {
             e.data("color", "grey");
     }
     let logProb = nodeLogOdds - Math.log(1 + Math.exp(nodeLogOdds));
-    console.log("total logodds",nodeLogOdds,"logprob", logProb);
-    assert(logProb==OLDupdateEdgePredValuesGetNodeLogProb(n));
-    console.log("logprob", logProb, "oldlogprob", OLDupdateEdgePredValuesGetNodeLogProb(n));
     return logProb;
 }
 function computeBelievabilityFromLogLik(logLik) {
-    let believability = (logLik - MINLOGPROB) / (MAXLOGPROB - MINLOGPROB) * 100;
+    //believability is a scale of two parts. 
+    //0-50% maps MINLOGPROB to PERMITTEDMINLOGPROB
+    //50-100% maps PERMITTEDMINLOGPROB to MAXLOGPROB
+    //You might ask why this is not done in probability space, not log probability space.
+    //It just doesn't work so well for a display that way.
+    let believability;
+    if (logLik < PERMITTEDMINLOGPROB)
+        believability = (logLik - MINLOGPROB) / (PERMITTEDMINLOGPROB - MINLOGPROB) * 50;
+    else
+        believability = 50 + (logLik - PERMITTEDMINLOGPROB) / (MAXLOGPROB - PERMITTEDMINLOGPROB) * 50;
+    
     //round to 1 decimal place
-    return Math.round(believability * 10) / 10;
+    return believability.toFixed(1);
 }
 function updateLogLik(cy) {
     let logLik = 0;
