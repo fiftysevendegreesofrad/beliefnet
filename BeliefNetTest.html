@@ -21,6 +21,7 @@
 
     <script src="gamedata.js"></script>
     <script src="BeliefGraphUtils.js"></script>
+    <script src="priority-queue.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
 
@@ -46,35 +47,149 @@
                     result.push([optionIndex].concat(tailCombination));
             return result;
         }
-        function computeMinMaxLogProbs(cy) {
-            let combinations;
+        function computeStateGraphNodes(cy) {
             let nodes = cy.nodes();
-            combinations = getAllPredCombinations(nodes);
-            result = [];
+            let combinations = getAllPredCombinations(nodes);
+            let allLogProbs = [];
+            let stateGraphNodes = [];
             for (let i = 0; i < combinations.length; i++) {
                 let nodesToChange = {};
                 for (let j = 0; j < nodes.length; j++)
                     nodesToChange[nodes[j].id()] = combinations[i][j];
-                result.push(altNetworkLogLik(cy, nodesToChange));
+                let logprob = altNetworkLogLik(cy, nodesToChange);
+                allLogProbs.push(logprob);
+                stateGraphNodes.push({id:i, state: combinations[i], logProb: logprob, neighbours: [] });
             }
             //get min and max values from result
-            let MINLOGPROB = Math.min(...result);
-            let MAXLOGPROB = Math.max(...result);
+            let MINLOGPROB = Math.min(...allLogProbs);
+            let MAXLOGPROB = Math.max(...allLogProbs);
 
-            let maxIndex = result.indexOf(Math.max(...result));
+            let maxIndex = allLogProbs.indexOf(Math.max(...allLogProbs));
             console.log(combinations[maxIndex]);
             console.log(MINLOGPROB, MAXLOGPROB);
+            return stateGraphNodes;
+        }
+        function computeStateGraphEdges(nodes) {
+            for (n of nodes) {
+                for (n1 of nodes) {
+                    //if the state of n1 and the state of n differ by exactly one element
+                    //then add an edge from n1 to n
+                    let state = n.state;
+                    let state1 = n1.state;
+                    let diffCount = 0;
+                    for (let i = 0; i < state.length; i++)
+                        if (state[i] != state1[i])
+                            diffCount++;
+                    if (diffCount == 1)
+                        n.neighbours.push(n1);
+                }
+            }
+        }
+        function describeStateChange(beliefNetGraph,before,after)
+        {
+            let result = "";
+            for (let i = 0; i < before.length; i++)
+                if (before[i] != after[i])
+                    result += predicateToOption(beliefNetGraph.nodes()[i],after[i])+" ";
+            return result;
+        }
+        class SearchState {
+            constructor(node,steps=0,backtrace=null,minLogProb=node.logProb) {
+                this.minLogProb = minLogProb;
+                this.steps = steps;
+                this.backtrace = backtrace;
+                this.node = node;
+            }
 
+            //issue: do we discard ways to reach the same node at worse prob? yes
+            //issue: do we discard ways to reach the same node with more steps? only if the minimum cost is the same or better
+            getOutgoing(nodeBestSearchStates)
+            {
+                let outgoingStates = [];
+                for (n of this.node.neighbours)
+                {
+                    let newMinLogProb = Math.min(this.minLogProb, n.logProb);
+                    let newSteps = this.steps+1;
+                    
+                    let potentialNewSearchState = new SearchState(n,newSteps,this,newMinLogProb);
+                    let nodeUnexplored = !(n.id in nodeBestSearchStates);
+                    if (nodeUnexplored || potentialNewSearchState.compare(nodeBestSearchStates[n.id]) > 0)
+                        outgoingStates.push(potentialNewSearchState);
+                }
+                return outgoingStates;
+            }
+
+            compare(other) { //returns 1 if this is better, -1 for worse, 0 for equal
+                if (this.minLogProb > other.minLogProb)
+                    return 1;
+                if (this.minLogProb < other.minLogProb)
+                    return -1;
+                if (this.steps < other.steps)
+                    return 1;
+                if (this.steps > other.steps)
+                    return -1;
+                return 0;
+            }
+        }
+        function findMaxLikelihoodPath(beliefNetGraph, startNode, endNode) {
+            //NOTE this works on the stateNet graph, not the beliefNet graph which is only included to interpret the results
+            let queue = new PriorityQueue({ comparator: function(b, a) { return a.compare(b); }});
+            let nodeBestSearchStates = {};
+            let startSearchState = new SearchState(startNode);
+            queue.queue(startSearchState);
+            nodeBestSearchStates[startNode.id] = startSearchState;
+            while (queue.length > 0) {
+                let searchState = queue.dequeue();
+                if (searchState.node == endNode) {
+                    console.log("Found path with logprob "+searchState.minLogProb+" and "+searchState.steps+" steps.");
+                    let path = [];
+                    let current = searchState;
+                    while (current.backtrace != null) {
+                        let after = current;
+                        current = current.backtrace;
+                        //round current.node.logprob to 2 decimal places
+                        lpOutput = Math.round(current.node.logProb * 100) / 100;
+                        path.push(lpOutput+" "+describeStateChange(beliefNetGraph,current.node.state,after.node.state));
+                    }
+                    path.reverse();
+                    for (p of path)
+                        console.log(p);
+                    return;
+                }
+                let outgoingStates = searchState.getOutgoing(nodeBestSearchStates);
+                for (s of outgoingStates) {
+                    queue.queue(s);
+                    nodeBestSearchStates[s.node.id] = s;
+                }
+            }
+            console.log("No path found.");
+        }
+        function assert(bool) {
+            if (!bool)
+                throw "Assertion failed.";
         }
         document.addEventListener('DOMContentLoaded', async function () {
 
-            let elements = await load_elements();
-
-            var cy = window.cy = cytoscape({
-                elements: elements,
-
+            let beliefNet = await load_elements(debug=false);
+            
+            var beliefNetGraph = cytoscape({
+                elements: beliefNet,
             });
-            computeMinMaxLogProbs(cy);
+            let stateGraph = computeStateGraphNodes(beliefNetGraph);
+            console.log("Computed "+stateGraph.length+" state graph nodes.");
+
+            let endNode = stateGraph[0];
+            let startNode = stateGraph[stateGraph.length - 1];
+            assert(endNode.state.every(x => x === 1));
+            assert(startNode.state.every(x => x === 0));
+            console.log("startNode logprob", startNode.logProb);
+            console.log("endNode logprob", endNode.logProb);
+
+
+            computeStateGraphEdges(stateGraph);
+            console.log("Computed state graph edges.");
+
+            findMaxLikelihoodPath(beliefNetGraph, startNode, endNode);
         });
 
     </script>

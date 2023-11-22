@@ -27,8 +27,9 @@
 
 		<script>
 			let DEVMODE = true;
-			let narrative = [];
+			let nodeDisplay = DEVMODE?"element":"none";
 
+			let narrative = [];
 			
 			function updateBelievabilityDisplay(cy)
 			{
@@ -80,7 +81,7 @@
 								'pie-1-background-size':'mapData(baseProb,0,1,0,100)',
 								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
 								'pie-2-background-size':'mapData(baseProb,0,1,100,0)',
-								'display':'none'
+								'display':nodeDisplay
 							}
 						},
 						{
@@ -223,8 +224,9 @@
 						let buttonPredValue = getPredicateFromIndex(node.data(), i);
 						button.innerHTML = "Influence";
 
+						console.log("Computing believability for "+options[i]);
 						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:buttonPredValue}));
-						let minBelievability = computeBelievabilityFromLogLik(-6.1);
+						let minBelievability = computeBelievabilityFromLogLik(PERMITTEDMINLOGPROB);
 						
 						let possible = resultingBelievability>minBelievability;
 						

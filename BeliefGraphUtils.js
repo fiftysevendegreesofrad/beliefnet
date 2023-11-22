@@ -1,5 +1,8 @@
-function predicateToIndex(node) {
-    return (1 - node.data("predicateValue")) * (node.data("options").length - 1);
+function predicateToIndex(node, predicateValue=node.data("predicateValue")) {
+    return (1 - predicateValue) * (node.data("options").length - 1);
+}
+function predicateToOption(node, predicateValue) {
+    return node.data("options")[predicateToIndex(node, predicateValue)];
 }
 function getPredicateFromIndex(node, index) {
     return 1 - index / (node.options.length - 1);
@@ -14,10 +17,11 @@ function updateEdgeColoursGetNodeLogProb(n) {
     let baseProb = n.data("baseProb");
     let nodeLogOdds = Math.log(baseProb / (1 - baseProb));
 
+    console.log("baseprob", baseProb, "logodds", nodeLogOdds);
     for (e of n.incomers("edge")) {
         let nodeMutualSupport = computeNodeMutualSupport(n, e.source());
         nodeLogOdds += nodeMutualSupport;
-
+        console.log("mutual support", nodeMutualSupport, "for edge", e.source().data("displaylabel"));
         if (nodeMutualSupport > 0)
             e.data("color", "green");
         else if (nodeMutualSupport < 0)
@@ -25,7 +29,9 @@ function updateEdgeColoursGetNodeLogProb(n) {
         else
             e.data("color", "grey");
     }
-    return nodeLogOdds - Math.log(1 + Math.exp(nodeLogOdds));
+    let logProb = nodeLogOdds - Math.log(1 + Math.exp(nodeLogOdds));
+    console.log("total logodds",nodeLogOdds,"logprob", logProb);
+    return logProb;
 }
 function computeBelievabilityFromLogLik(logLik) {
     let believability = (logLik - MINLOGPROB) / (MAXLOGPROB - MINLOGPROB) * 100;
