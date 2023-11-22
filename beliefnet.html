@@ -32,13 +32,14 @@
 
     /* Set height of the left panel */
     .left-panel {
-      /*height: 500px;*/
+      height: 100%;
       background-color: #aaa;
+	  padding: 30px;
     }
 
     /* Set height of the right panel */
     .right-panel {
-      /*height: 500px;*/
+      height: 100%;
       background-color: #bbb;
     }
 
@@ -78,6 +79,10 @@
 			}
 			h2 {
 				font-size: 1.5em;
+				font-weight: bold;
+			}
+			h3 {
+				font-size: 1em;
 				font-weight: bold;
 			}
 
@@ -163,7 +168,7 @@ HOMEOPATHY 0.3: Homeopathy
 Homeopathy definitely works
 Science has proven nothing about homeopathy, but one day it might
 Homeopathy is indistinguishable from placebo, we're done here
-+5 IBSCURE
++10 IBSCURE
 
 COMPETENT 0.5: I got fired 
 I got fired because the elite are trying to suppress me 
@@ -171,12 +176,11 @@ I got fired because my manager was incompetent
 I got fired because I am incompetent 
 +5 HOPE
 
-IBSCURE 0.5: Irritable Bowel Syndrome 
-My IBS can be cured
+IBSCURE 0.5: IBS 
+My Irritable Bowel Syndrome can be cured
 ...well, maybe. I dunno.
-My IBS is incurable
+My Irritable Bowel Syndrome is incurable
 +5 HOPE
-+5 HOMEOPATHY
 
 HOPE 0.9: Hope
 There is hope for me! 
@@ -233,17 +237,23 @@ There is no hope for me!
 			{
 				return 1-index/(node.options.length-1);
 			}
-			function updateEdgePredValuesGetNodeLogProb(n)
+			function computeNodeMutualSupport(n1,n2)
+			{
+				let n1CoeffValue = n1.data("predicateValue")*2-1;
+				let n2CoeffValue = n2.data("predicateValue")*2-1;
+				let weight = n1.edgesWith(n2).data("weight");
+				return n1CoeffValue*n2CoeffValue*weight;
+			}
+			function updateEdgeColoursGetNodeLogProb(n)
 			{
 				let baseProb = n.data("baseProb");
 				let nodeLogOdds = Math.log(baseProb/(1-baseProb));
-				let nodeCoeffValue = n.data("predicateValue")*2-1;
+				
 				for (e of n.incomers("edge"))
 				{
-					let sourcePredValue = e.source().data("predicateValue");
-					let incomingCoeffValue = sourcePredValue*2-1;
-					nodeLogOdds += incomingCoeffValue*e.data("weight");
-					let nodeMutualSupport = incomingCoeffValue*nodeCoeffValue*Math.sign(e.data("weight"));
+					let nodeMutualSupport = computeNodeMutualSupport(n,e.source());
+					nodeLogOdds += nodeMutualSupport;
+					
 					if (nodeMutualSupport>0)
 						e.data("color","green");
 					else if (nodeMutualSupport<0)
@@ -251,7 +261,6 @@ There is no hope for me!
 					else
 						e.data("color","grey");
 				}
-				nodeLogOdds *= nodeCoeffValue;
 				return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
 			}
 			function computeBelievabilityFromLogLik(logLik)
@@ -283,7 +292,7 @@ There is no hope for me!
 				let logLik = 0;
 				for (n of cy.nodes())
 				{
-					let logProb = updateEdgePredValuesGetNodeLogProb(n);
+					let logProb = updateEdgeColoursGetNodeLogProb(n);
 					n.data("logprob",logProb);
 					n.data("displaylabel",n.data("label"));
 					logLik += logProb;
@@ -401,7 +410,11 @@ There is no hope for me!
 								'opacity': 0.5,
 								'target-arrow-shape': 'triangle',
 								'target-arrow-color': 'data(color)',
-								'curve-style': 'bezier'
+								'source-arrow-shape': 'triangle',
+								'source-arrow-color': 'data(color)',
+								'curve-style': 'unbundled-bezier',
+								'control-point-distances': '10px -10px',
+								'control-point-weights': '0.25 0.75'
 							}
 						}
 					],
@@ -412,7 +425,9 @@ There is no hope for me!
 					userZoomingEnabled: false,
 					userPanningEnabled: false
 				});
-				cy.nodes().first().style("display","element");
+				let firstNode = cy.nodes().first();
+				firstNode.style("display","element");
+				displayNodeDetails(firstNode);
 				updateGraphDisplay(cy);
 				updateLogLik(cy); //call to initialize node logprobs
 				computeMinMaxLogProbs(cy);
@@ -448,15 +463,50 @@ There is no hope for me!
 					}
 					else
 					{
-						let p = document.createElement("ul");
-
+						let supportingBeliefs = [];
+						let opposingBeliefs = [];
+						let neutralBeliefs = [];
 						for (n of node.openNeighborhood("node"))
 						{
-							let weight = node.edgesWith(n).data("weight");
-							if (weight>0) weight = "+"+weight;
-							p.innerHTML += "<li>"+weight+": "+n.data("displaylabel")+"</li>";
+							let mutualSupport = computeNodeMutualSupport(node,n);
+							let otherBelief = n.data().options[predicateToIndex(n)];
+							if (mutualSupport>0)
+								supportingBeliefs.push([mutualSupport,otherBelief]);
+							else if (mutualSupport<0)
+								opposingBeliefs.push([mutualSupport,otherBelief]);
+							else
+								neutralBeliefs.push([mutualSupport,otherBelief]);
 						}
-						document.getElementById("ResearchButton").appendChild(p);
+						if (supportingBeliefs.length>0)
+						{
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Supporting:</h3>";
+							let list = document.createElement("ul");
+							for (let [mutualSupport,otherBelief] of supportingBeliefs)
+							{
+								list.innerHTML += "<li><font color=green>+"+mutualSupport+": "+otherBelief+"</font></li>";
+							}
+							document.getElementById("ResearchButton").appendChild(list);
+						}
+						if (opposingBeliefs.length>0)
+						{
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Opposing:</h3>";
+							let list = document.createElement("ul");
+							for (let [mutualSupport,otherBelief] of opposingBeliefs)
+							{
+								list.innerHTML += "<li><font color=red>+"+mutualSupport+": "+otherBelief+"</font></li>";
+							}
+							document.getElementById("ResearchButton").appendChild(list);
+						}
+						if (neutralBeliefs.length>0)
+						{
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Neutral:</h3>";
+							let list = document.createElement("ul");
+							for (let [mutualSupport,otherBelief] of neutralBeliefs)
+							{
+								list.innerHTML += "<li>"+otherBelief+"</li>";
+							}
+							document.getElementById("ResearchButton").appendChild(list);
+						}
 					}
 					//create buttons for other options
 					document.getElementById("nodeDetails").innerHTML="";
