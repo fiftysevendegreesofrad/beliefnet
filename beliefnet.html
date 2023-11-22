@@ -35,7 +35,13 @@
       height: 100%;
       background-color: #aaa;
 	  padding: 30px;
+	  transform: translateY(100%);
+ 	  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     }
+	.left-panel.show {
+		opacity: 1;
+		transform: translateY(0%);
+	}
 
     /* Set height of the right panel */
     .right-panel {
@@ -438,8 +444,12 @@ There is no hope for me!
 					displayNodeDetails(node);
 				});
 
-					function displayNodeDetails(node)
+				function displayNodeDetails(node)
 				{
+					var leftPanel = document.getElementsByClassName("left-panel")[0];
+					leftPanel.classList.remove("show");
+					setTimeout(function() {leftPanel.classList.add("show");}, 500);
+
 					document.getElementById("topic").innerHTML=node.data("displaylabel");
 					let options = node.data().options;
 					let whichSelected = predicateToIndex(node);
@@ -493,7 +503,7 @@ There is no hope for me!
 							let list = document.createElement("ul");
 							for (let [mutualSupport,otherBelief] of opposingBeliefs)
 							{
-								list.innerHTML += "<li><font color=red>+"+mutualSupport+": "+otherBelief+"</font></li>";
+								list.innerHTML += "<li><font color=red>"+mutualSupport+": "+otherBelief+"</font></li>";
 							}
 							document.getElementById("ResearchButton").appendChild(list);
 						}
@@ -573,6 +583,7 @@ There is no hope for me!
 					}
 					document.getElementById("nodeDetails").appendChild(table);
 				}
+				
 
 
 			});
