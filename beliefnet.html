@@ -33,9 +33,11 @@
 			
 			function updateBelievabilityDisplay(cy)
 			{
-				let believability = computeBelievabilityFromLogLik(updateLogLik(cy));
-				console.log(believability);
+				let logLik = updateLogLik(cy);
+				let believability = computeBelievabilityFromLogLik(logLik);
 				document.getElementById("loglik").innerHTML = believability;
+				if (DEVMODE)
+					document.getElementById("loglik").innerHTML += " "+logLik.toFixed(2);
 				cy.resize();
 			}
 			function updateNarrativeDisplay()
@@ -224,16 +226,18 @@
 						let buttonPredValue = getPredicateFromIndex(node.data(), i);
 						button.innerHTML = "Influence";
 
-						console.log("Computing believability for "+options[i]);
-						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:buttonPredValue}));
-						let minBelievability = computeBelievabilityFromLogLik(PERMITTEDMINLOGPROB);
+						let resultingLogLik = altNetworkLogLik(cy,{[node.id()]:buttonPredValue});
+						let resultingBelievability = computeBelievabilityFromLogLik(resultingLogLik);
 						
-						let possible = resultingBelievability>minBelievability;
+						let possible = resultingLogLik>=PERMITTEDMINLOGPROB;
 						
 						if (possible)
 						{
 							if (DEVMODE)
+							{
 									button.style.backgroundColor = "green";
+									button.innerHTML = resultingLogLik.toFixed(2);
+							}
 							button.addEventListener("click", function(evt1){
 								node.data("predicateValue",buttonPredValue); 
 								narrative.push({message:options[i], undo:prevNodeValues});
@@ -245,7 +249,10 @@
 						else
 						{
 							if (DEVMODE)
+							{
 									button.style.backgroundColor = "red";
+									button.innerHTML = resultingLogLik.toFixed(2);
+							}
 							button.addEventListener("click", function(evt1){
 								//make modal popup
 								let modal = document.getElementById("myModal");

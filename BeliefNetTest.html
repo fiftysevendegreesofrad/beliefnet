@@ -26,6 +26,10 @@
     <link rel="stylesheet" href="style.css">
 
     <script>
+        async function output(text) {
+            document.getElementById("output").innerHTML += "<p>" + text + "</p>";
+            await new Promise(resolve => setTimeout(resolve,0));
+        }
         function getAllPredCombinations(nodes) {
             //recurse through all possible node predicate values
             let head = nodes[0];
@@ -65,8 +69,9 @@
             let MAXLOGPROB = Math.max(...allLogProbs);
 
             let maxIndex = allLogProbs.indexOf(Math.max(...allLogProbs));
-            console.log(combinations[maxIndex]);
-            console.log(MINLOGPROB, MAXLOGPROB);
+            output("max log prob for state: "+combinations[maxIndex]);
+            output("let MINLOGPROB="+MINLOGPROB+";");
+            output("let MAXLOGPROB="+MAXLOGPROB+";");
             return stateGraphNodes;
         }
         function computeStateGraphEdges(nodes) {
@@ -141,19 +146,21 @@
             while (queue.length > 0) {
                 let searchState = queue.dequeue();
                 if (searchState.node == endNode) {
-                    console.log("Found path with logprob "+searchState.minLogProb+" and "+searchState.steps+" steps.");
+                    output("Found path with "+searchState.steps+" steps.");
+                    output("let PERMITTEDMINLOGPROB="+searchState.minLogProb+";");
                     let path = [];
                     let current = searchState;
+                    path.push(current.node.logProb.toFixed(2));
                     while (current.backtrace != null) {
                         let after = current;
                         current = current.backtrace;
                         //round current.node.logprob to 2 decimal places
-                        lpOutput = Math.round(current.node.logProb * 100) / 100;
-                        path.push(lpOutput+" "+describeStateChange(beliefNetGraph,current.node.state,after.node.state));
+                        path.push(describeStateChange(beliefNetGraph,current.node.state,after.node.state));
+                        path.push(current.node.logProb.toFixed(2));
                     }
                     path.reverse();
                     for (p of path)
-                        console.log(p);
+                        output(p);
                     return;
                 }
                 let outgoingStates = searchState.getOutgoing(nodeBestSearchStates);
@@ -162,7 +169,7 @@
                     nodeBestSearchStates[s.node.id] = s;
                 }
             }
-            console.log("No path found.");
+            output("No path found.");
         }
         document.addEventListener('DOMContentLoaded', async function () {
 
@@ -171,19 +178,19 @@
             var beliefNetGraph = cytoscape({
                 elements: beliefNet,
             });
-            let stateGraph = computeStateGraphNodes(beliefNetGraph);
-            console.log("Computed "+stateGraph.length+" state graph nodes.");
+            let stateGraph = await computeStateGraphNodes(beliefNetGraph);
+            output("Computed "+stateGraph.length+" state graph nodes.");
 
             let endNode = stateGraph[0];
             let startNode = stateGraph[stateGraph.length - 1];
             assert(endNode.state.every(x => x === 1));
             assert(startNode.state.every(x => x === 0));
-            console.log("startNode logprob", startNode.logProb);
-            console.log("endNode logprob", endNode.logProb);
+            output("startNode logprob "+startNode.logProb);
+            output("endNode logprob "+endNode.logProb);
 
 
             computeStateGraphEdges(stateGraph);
-            console.log("Computed state graph edges.");
+            output("Computed state graph edges.");
 
             findMaxLikelihoodPath(beliefNetGraph, startNode, endNode);
         });
@@ -192,7 +199,9 @@
 </head>
 
 <body>
-    BeliefNet data test.
+    <div id="output">
+        <p>BeliefNet data test.</p>
+    </div>
 </body>
 
 </html>

@@ -1,6 +1,6 @@
-const MINLOGPROB = -86;
+const MINLOGPROB = -81;
 const MAXLOGPROB = 0;
-const PERMITTEDMINLOGPROB = -15.7;
+const PERMITTEDMINLOGPROB = -5.74;
 
 async function load_elements(debug=false)
 {
