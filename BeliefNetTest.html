@@ -164,10 +164,6 @@
             }
             console.log("No path found.");
         }
-        function assert(bool) {
-            if (!bool)
-                throw "Assertion failed.";
-        }
         document.addEventListener('DOMContentLoaded', async function () {
 
             let beliefNet = await load_elements(debug=false);

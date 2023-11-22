@@ -1,3 +1,7 @@
+function assert(bool) {
+    if (!bool)
+        throw "Assertion failed.";
+}
 function predicateToIndex(node, predicateValue=node.data("predicateValue")) {
     return (1 - predicateValue) * (node.data("options").length - 1);
 }
@@ -7,15 +11,30 @@ function predicateToOption(node, predicateValue) {
 function getPredicateFromIndex(node, index) {
     return 1 - index / (node.options.length - 1);
 }
+function nodeCoeffValue(node) {
+    return node.data("predicateValue") * 2 - 1;
+}
 function computeNodeMutualSupport(n1, n2) {
-    let n1CoeffValue = n1.data("predicateValue") * 2 - 1;
-    let n2CoeffValue = n2.data("predicateValue") * 2 - 1;
     let weight = n1.edgesWith(n2).data("weight");
-    return n1CoeffValue * n2CoeffValue * weight;
+    return nodeCoeffValue(n1) * nodeCoeffValue(n2) * weight;
+}
+function OLDupdateEdgePredValuesGetNodeLogProb(n)
+{
+    let baseProb = n.data("baseProb");
+    let nodeLogOdds = Math.log(baseProb/(1-baseProb));
+    let nodeCoeffValue = n.data("predicateValue")*2-1;
+    for (e of n.incomers("edge"))
+    {
+        let sourcePredValue = e.source().data("predicateValue");
+        let incomingCoeffValue = sourcePredValue*2-1;
+        nodeLogOdds += incomingCoeffValue*e.data("weight");
+    }
+    nodeLogOdds *= nodeCoeffValue;
+    return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
 }
 function updateEdgeColoursGetNodeLogProb(n) {
     let baseProb = n.data("baseProb");
-    let nodeLogOdds = Math.log(baseProb / (1 - baseProb));
+    let nodeLogOdds = Math.log(baseProb / (1 - baseProb))*nodeCoeffValue(n);
 
     console.log("baseprob", baseProb, "logodds", nodeLogOdds);
     for (e of n.incomers("edge")) {
@@ -31,6 +50,8 @@ function updateEdgeColoursGetNodeLogProb(n) {
     }
     let logProb = nodeLogOdds - Math.log(1 + Math.exp(nodeLogOdds));
     console.log("total logodds",nodeLogOdds,"logprob", logProb);
+    assert(logProb==OLDupdateEdgePredValuesGetNodeLogProb(n));
+    console.log("logprob", logProb, "oldlogprob", OLDupdateEdgePredValuesGetNodeLogProb(n));
     return logProb;
 }
 function computeBelievabilityFromLogLik(logLik) {
