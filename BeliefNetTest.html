@@ -1,0 +1,87 @@
+<!DOCTYPE>
+
+<html>
+
+<head>
+    <title>BeliefNet</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+    <!--polyfills are needed for this extension for old browsers like IE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.5.7/shim.min.js"></script>
+
+    <script src="https://unpkg.com/layout-base/layout-base.js"></script>
+    <script src="https://unpkg.com/avsdf-base/avsdf-base.js"></script>
+    <script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
+
+    <script src="gamedata.js"></script>
+    <script src="BeliefGraphUtils.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        function getAllPredCombinations(nodes) {
+            //recurse through all possible node predicate values
+            let head = nodes[0];
+            let tail = nodes.slice(1);
+            let options = head.data("options");
+            let optionsPredValues = [];
+            for (let i = 0; i < options.length; i++)
+                optionsPredValues.push(getPredicateFromIndex(head.data(), i));
+
+            let tailCombinations;
+            if (tail.length > 0)
+                tailCombinations = getAllPredCombinations(tail);
+            else
+                tailCombinations = [[]];
+
+            let result = [];
+            for (optionIndex of optionsPredValues)
+                for (tailCombination of tailCombinations)
+                    result.push([optionIndex].concat(tailCombination));
+            return result;
+        }
+        function computeMinMaxLogProbs(cy) {
+            let combinations;
+            let nodes = cy.nodes();
+            combinations = getAllPredCombinations(nodes);
+            result = [];
+            for (let i = 0; i < combinations.length; i++) {
+                let nodesToChange = {};
+                for (let j = 0; j < nodes.length; j++)
+                    nodesToChange[nodes[j].id()] = combinations[i][j];
+                result.push(altNetworkLogLik(cy, nodesToChange));
+            }
+            //get min and max values from result
+            let MINLOGPROB = Math.min(...result);
+            let MAXLOGPROB = Math.max(...result);
+
+            let maxIndex = result.indexOf(Math.max(...result));
+            console.log(combinations[maxIndex]);
+            console.log(MINLOGPROB, MAXLOGPROB);
+
+        }
+        document.addEventListener('DOMContentLoaded', async function () {
+
+            let elements = await load_elements();
+
+            var cy = window.cy = cytoscape({
+                elements: elements,
+
+            });
+            computeMinMaxLogProbs(cy);
+        });
+
+    </script>
+</head>
+
+<body>
+    BeliefNet data test.
+</body>
+
+</html>

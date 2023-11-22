@@ -20,55 +20,16 @@
 		<script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
 
 		<script src="gamedata.js"></script>
+		<script src="BeliefGraphUtils.js"></script>
+
 
 		<link rel="stylesheet" href="style.css">
 
 		<script>
 			let DEVMODE = true;
-			let MINLOGPROB,MAXLOGPROB;
 			let narrative = [];
 
-
-			function predicateToIndex(node)
-			{
-				return (1-node.data("predicateValue"))*(node.data("options").length-1);
-			}
-			function getPredicateFromIndex(node, index)
-			{
-				return 1-index/(node.options.length-1);
-			}
-			function computeNodeMutualSupport(n1,n2)
-			{
-				let n1CoeffValue = n1.data("predicateValue")*2-1;
-				let n2CoeffValue = n2.data("predicateValue")*2-1;
-				let weight = n1.edgesWith(n2).data("weight");
-				return n1CoeffValue*n2CoeffValue*weight;
-			}
-			function updateEdgeColoursGetNodeLogProb(n)
-			{
-				let baseProb = n.data("baseProb");
-				let nodeLogOdds = Math.log(baseProb/(1-baseProb));
-				
-				for (e of n.incomers("edge"))
-				{
-					let nodeMutualSupport = computeNodeMutualSupport(n,e.source());
-					nodeLogOdds += nodeMutualSupport;
-					
-					if (nodeMutualSupport>0)
-						e.data("color","green");
-					else if (nodeMutualSupport<0)
-						e.data("color","red");
-					else
-						e.data("color","grey");
-				}
-				return nodeLogOdds - Math.log(1+Math.exp(nodeLogOdds));
-			}
-			function computeBelievabilityFromLogLik(logLik)
-			{
-				let believability = (logLik-MINLOGPROB)/(MAXLOGPROB-MINLOGPROB)*100;
-				//round to 1 decimal place
-				return Math.round(believability*10)/10;
-			}
+			
 			function updateBelievabilityDisplay(cy)
 			{
 				let believability = computeBelievabilityFromLogLik(updateLogLik(cy));
@@ -86,76 +47,6 @@
 					html += "<div class='line'><button onclick='revert("+undo+")'>Undo</button>"+message+"</div>";
 				}
 				document.getElementById("narrative").innerHTML = html;
-			}
-			function updateLogLik(cy)
-			{
-				let logLik = 0;
-				for (n of cy.nodes())
-				{
-					let logProb = updateEdgeColoursGetNodeLogProb(n);
-					n.data("logprob",logProb);
-					n.data("displaylabel",n.data("label"));
-					logLik += logProb;
-				}
-				return logLik;
-			}
-			function altNetworkLogLik(cy,nodesToChange)
-			{
-				let eles = cy.elements().map(x=>x.json());
-				let cyClone = cytoscape({elements: eles, headless: true});
-				for (let [nodeID, nodePredValue] of Object.entries(nodesToChange))
-					cyClone.getElementById(nodeID).data("predicateValue",nodePredValue);
-				return updateLogLik(cyClone);
-			}
-			function getAllPredCombinations(nodes)
-			{
-				//recurse through all possible node predicate values
-				let head = nodes[0];
-				let tail = nodes.slice(1);
-				let options = head.data("options");
-				let optionsPredValues = [];
-				for (let i=0; i<options.length; i++)
-					optionsPredValues.push(getPredicateFromIndex(head.data(), i));
-
-				let tailCombinations;
-				if (tail.length>0)
-					tailCombinations = getAllPredCombinations(tail);
-				else
-					tailCombinations = [[]];
-
-				let result = [];
-				for (optionIndex of optionsPredValues)
-					for (tailCombination of tailCombinations)
-						result.push([optionIndex].concat(tailCombination));
-				return result;
-			}
-			function computeMinMaxLogProbs(cy)
-			{
-				let combinations;
-				let recompute = false;
-				if (recompute)
-				{
-					let nodes = cy.nodes();
-					combinations = getAllPredCombinations(nodes);
-					result = [];
-					for (let i = 0;i<combinations.length;i++)
-					{
-						let nodesToChange = {};
-						for (let j=0;j<nodes.length;j++)
-							nodesToChange[nodes[j].id()] = combinations[i][j];
-						result.push(altNetworkLogLik(cy,nodesToChange));
-					}
-				}
-				else result=[-80.47512266156517,-0.32923266463987577];
-				//get min and max values from result
-				MINLOGPROB = Math.min(...result);
-				MAXLOGPROB = Math.max(...result);
-				if (recompute)
-				{
-					let maxIndex = result.indexOf(Math.max(...result));
-					console.log(combinations[maxIndex]);
-					console.log(MINLOGPROB,MAXLOGPROB);
-				}
 			}
 			function updateGraphDisplay(cy)
 			{
@@ -177,8 +68,6 @@
 				
 				var cy = window.cy = cytoscape({
 					container: document.getElementById('cy'),
-
-
 
 					style: [
 						{
@@ -230,7 +119,6 @@
 				refreshNodeDetails(firstNode);
 				updateGraphDisplay(cy);
 				updateLogLik(cy); //call to initialize node logprobs
-				computeMinMaxLogProbs(cy);
 				updateBelievabilityDisplay(cy);
 
 				cy.bind('click', 'node', function(evt) {

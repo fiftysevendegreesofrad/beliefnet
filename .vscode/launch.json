@@ -7,6 +7,12 @@
         {
             "type": "msedge",
             "request": "launch",
+            "name": "Open beliefnettest.html",
+            "file": "c:\\code\\beliefnet\\BeliefNetTest.html"
+        },
+        {
+            "type": "msedge",
+            "request": "launch",
             "name": "Open beliefnet.html",
             "file": "c:\\code\\beliefnet\\beliefnet.html"
         }

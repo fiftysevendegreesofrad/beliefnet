@@ -1,3 +1,6 @@
+const MINLOGPROB = -80.47512266156517;
+const MAXLOGPROB = -0.32923266463987577;
+
 async function load_elements()
 {
     //let response = await fetch(new Request(filename));
