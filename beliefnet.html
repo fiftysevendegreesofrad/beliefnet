@@ -28,6 +28,8 @@
 		line-height: 50px;
 		}
 
+	
+
     /* Set height of the left panel */
     .left-panel {
       /*height: 500px;*/
@@ -39,6 +41,18 @@
       /*height: 500px;*/
       background-color: #bbb;
     }
+
+	/* make modal-content narrow and centered on screen */
+	.modal-content {
+		width: 50%;
+		margin: 0 auto;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		padding: 20px;
+	}
+
 
 			body {
 				font-family: helvetica;
@@ -59,8 +73,11 @@
 			}
 
 			h1 {
-				opacity: 0.5;
-				font-size: 1em;
+				font-size: 2em;
+				font-weight: bold;
+			}
+			h2 {
+				font-size: 1.5em;
 				font-weight: bold;
 			}
 
@@ -84,6 +101,7 @@
 		</style>
 
 		<script>
+			let DEVMODE = true;
 			let MINLOGPROB,MAXLOGPROB;
 			let narrative = [];
 
@@ -413,63 +431,95 @@ There is no hope for me!
 
 				cy.bind('click', 'node', function(evt) {
 					let node = evt.target;
+					displayNodeDetails(node);
+				});
+
+					function displayNodeDetails(node)
+				{
+					document.getElementById("topic").innerHTML=node.data("displaylabel");
+					let options = node.data().options;
+					let whichSelected = predicateToIndex(node);
+					document.getElementById("currentBelief").innerHTML=options[whichSelected];
+
 					//create research button
 					document.getElementById("ResearchButton").innerHTML="";
 					if (!node.data("researched"))
 					{
 						let button = document.createElement("button");
-						button.innerHTML = "Research";
+						button.innerHTML = "Research Related Beliefs";
 						button.addEventListener("click", function(evt1){
 							node.data("researched",true);
-							button.parentNode.removeChild(button);
 							//iterate through neighbouring nodes
 							for (n of node.openNeighborhood("node"))
 								n.style("display","element");
+							displayNodeDetails(node);
 						});
 						document.getElementById("ResearchButton").appendChild(button);
 					}
-					//create radio buttons from options
-					let options = node.data().options;
-					let whichSelected = predicateToIndex(evt.target);
+					else
+					{
+						let p = document.createElement("p");
+						for (n of node.openNeighborhood("node"))
+							p.innerHTML += n.data("displaylabel")+"<br>";
+						document.getElementById("ResearchButton").appendChild(p);
+					}
+					//create buttons for other options
 					document.getElementById("nodeDetails").innerHTML="";
-					let prevNodeValues = cy.elements().map(x=>x.json());
+					let prevNodeValues = cy.elements().map(x=>x.json()); //for undo not yet implemented
 					for (let i=0; i<options.length; i++)
 					{
-						let radio = document.createElement("input");
-						radio.type = "radio";
-						radio.name = "radio";
-						radio.id = "radio"+i;
-						radio.className = "radio";
-						radio.value = i;
-						radio.checked = (i==whichSelected)?"checked":"";
-						let narrativeMessage = options[i];
-						let radioPredValue = getPredicateFromIndex(node.data(), i);
-						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:radioPredValue}));
+						if (i==whichSelected) continue;
+
+						let optionPara = document.createElement("p");
+						optionPara.innerHTML = options[i];
+
+						let button = document.createElement("button");
+						let buttonPredValue = getPredicateFromIndex(node.data(), i);
+						button.innerHTML = "Influence";
+
+						let resultingBelievability = computeBelievabilityFromLogLik(altNetworkLogLik(cy,{[node.id()]:buttonPredValue}));
 						let minBelievability = computeBelievabilityFromLogLik(-6.1);
-						console.log("minbelievability="+minBelievability);
-						let enabled = resultingBelievability>minBelievability;
-						radio.disabled = !enabled;
-						if (enabled)
+						
+						let possible = resultingBelievability>minBelievability;
+						
+						if (possible)
 						{
-							radio.addEventListener("click", function(evt1){
-								node.data("predicateValue",radioPredValue); 
-								console.log(narrativeMessage);
-								narrative.push({message:narrativeMessage, undo:prevNodeValues});
+							if (DEVMODE)
+									button.style.backgroundColor = "green";
+							button.addEventListener("click", function(evt1){
+								node.data("predicateValue",buttonPredValue); 
+								narrative.push({message:options[i], undo:prevNodeValues});
 								updateBelievabilityDisplay(cy);
 								updateNarrativeDisplay();
+								displayNodeDetails(node);
 							});
 						}
-						let label = document.createElement("label");
-						let tooLow = enabled?"":", too low";
-						label.innerHTML = options[i]+" (resulting believability="+resultingBelievability+tooLow+")";
-						label.htmlFor = "radio"+i;
-						document.getElementById("nodeDetails").appendChild(radio);
-						document.getElementById("nodeDetails").appendChild(label);
+						else
+						{
+							if (DEVMODE)
+									button.style.backgroundColor = "red";
+							button.addEventListener("click", function(evt1){
+								//make modal popup
+								let modal = document.getElementById("myModal");
+								let span = document.getElementsByClassName("close")[0];
+								modal.style.display = "block";
+								span.onclick = function() {
+									modal.style.display = "none";
+								}
+								window.onclick = function(event) {
+									if (event.target == modal) {
+										modal.style.display = "none";
+									}
+								}
+								
+							});
+						}
+
+						document.getElementById("nodeDetails").appendChild(optionPara);
+						document.getElementById("nodeDetails").appendChild(button);
 						document.getElementById("nodeDetails").appendChild(document.createElement("br"));
 					}
-				
-
-				});
+				}
 
 
 			});
@@ -481,21 +531,32 @@ There is no hope for me!
 			<h1>Narrative Believability: <span id="loglik"/></h1>
 		</div>
 		
-		  <!-- Panels -->
-		  <div class="row">
-			<div class="col-sm-3 left-panel">
-				<div id="ResearchButton"></div>
-				<h1 id="nodeDetails"></h1>
+		<!-- Panels -->
+		<div class="row">
+		<div class="col-sm-3 left-panel">
+			<h1 id="topic"></h1>
+			<h2>Current Belief:</h2>
+			<p id="currentBelief"></p>
+			<h2>Alternative Beliefs:</h2>
+			<p id="nodeDetails"></p>
+			<h2>Related Beliefs:</h2>
+			<div id="ResearchButton"></div>
+		</div>
+		<div class="col-sm-6">
+			<div id="cy"></div>
+		</div>
+		<div class="col-sm-3 right-panel">
+			<h1>Narrative</h1>
+			<div id="narrative"></div>
+		</div>
+		</div>
+		
+		<div id="myModal" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<p>They don't buy it.</p>
 			</div>
-			<div class="col-sm-6">
-				<div id="cy"></div>
-			</div>
-			<div class="col-sm-3 right-panel">
-				<h1>Narrative</h1>
-				<div id="narrative"></div>
-			</div>
-		  </div>
-
+		</div>
 		
 		
 	</body>
