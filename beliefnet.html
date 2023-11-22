@@ -342,6 +342,20 @@ There is no hope for me!
 					console.log(MINLOGPROB,MAXLOGPROB);
 				}
 			}
+			function updateGraphDisplay(cy)
+			{
+				let visibleNodes = cy.nodes(":visible");
+				let layoutOptions = {
+						name: 'avsdf',
+						nodeSeparation: 120,
+						animate: "end",
+						animationDuration: 1000,
+						animationEasing: 'ease-in-out',
+						nodeSeparation: 120,
+						eles:visibleNodes
+					};
+				cy.layout(layoutOptions).run();
+			}
 			document.addEventListener('DOMContentLoaded', async function(){
 
 				let elements = await load_elements();
@@ -349,14 +363,7 @@ There is no hope for me!
 				var cy = window.cy = cytoscape({
 					container: document.getElementById('cy'),
 
-					layout: {
-						name: 'avsdf',
-						nodeSeparation: 120,
-						animate: "end",
-						animationDuration: 1000,
-						animationEasing: 'ease-in-out',
-						nodeSeparation: 120
-					},
+
 
 					style: [
 						{
@@ -425,6 +432,7 @@ There is no hope for me!
 					userPanningEnabled: false
 				});
 				cy.nodes().first().style("display","element");
+				updateGraphDisplay(cy);
 				updateLogLik(cy); //call to initialize node logprobs
 				computeMinMaxLogProbs(cy);
 				updateBelievabilityDisplay(cy);
@@ -453,6 +461,7 @@ There is no hope for me!
 							for (n of node.openNeighborhood("node"))
 								n.style("display","element");
 							displayNodeDetails(node);
+							updateGraphDisplay(cy);
 						});
 						document.getElementById("ResearchButton").appendChild(button);
 					}
