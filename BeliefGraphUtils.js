@@ -22,8 +22,17 @@ function updateEdgeColoursGetNodeLogProb(n) {
     let baseProb = n.data("baseProb");
     let nodeLogOdds = Math.log(baseProb / (1 - baseProb))*nodeCoeffValue(n);
 
-    for (e of n.incomers("edge")) {
-        let nodeMutualSupport = computeNodeMutualSupport(n, e.source());
+    let linkedEdges = [];
+    for (e of n.incomers("edge")) 
+        linkedEdges.push([e, e.source()]);
+    //uncomment to make all edges bidirectional
+    //for (e of n.outgoers("edge"))
+    //    linkedEdges.push([e, e.target()]);
+
+    for (let [e, otherNode] of linkedEdges)
+    {
+        assert(otherNode!==n);
+        let nodeMutualSupport = computeNodeMutualSupport(n, otherNode);
         nodeLogOdds += nodeMutualSupport;
         if (nodeMutualSupport > 0)
             e.data("color", "green");

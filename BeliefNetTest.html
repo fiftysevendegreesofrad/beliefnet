@@ -28,7 +28,7 @@
     <script>
         async function output(text) {
             document.getElementById("output").innerHTML += "<p>" + text + "</p>";
-            await new Promise(resolve => setTimeout(resolve,0));
+            await new Promise(resolve => setTimeout(resolve,1000)); //allow display refresh - bodge
         }
         function getAllPredCombinations(nodes) {
             //recurse through all possible node predicate values

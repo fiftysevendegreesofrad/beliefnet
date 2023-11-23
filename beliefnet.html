@@ -89,7 +89,8 @@
 			document.addEventListener('DOMContentLoaded', async function(){
 
 				let elements = await load_elements();
-				
+				let maxweight = elements.edges.map(x=>x.data.absweight).reduce((a,b)=>Math.max(a,b));
+
 				var cy = window.cy = cytoscape({
 					container: document.getElementById('cy'),
 
@@ -118,16 +119,17 @@
 						{
 							selector: 'edge',
 							style: {
-								'width': 'mapData(absweight, 0, 5, 0, 7)',
+								'width': 'mapData(absweight, 0, '+maxweight+', 0, 7)',
 								'line-color': 'data(color)',
 								'opacity': 0.5,
 								'target-arrow-shape': 'triangle',
 								'target-arrow-color': 'data(color)',
-								'source-arrow-shape': 'triangle',
-								'source-arrow-color': 'data(color)',
+								//'source-arrow-shape': 'triangle',
+								//'source-arrow-color': 'data(color)',
 								'curve-style': 'unbundled-bezier',
-								'control-point-distances': '10px -10px',
-								'control-point-weights': '0.25 0.75'
+								'control-point-distances': '10px',
+								'control-point-weights': '0.5',
+								'label':'data(weight)'
 							}
 						}
 					],
