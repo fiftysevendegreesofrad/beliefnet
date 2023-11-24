@@ -94,3 +94,43 @@ button {
 .radio {
     margin-left: 25px;
 }
+
+#fixed-text, #moving-text {
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 2em;
+}
+
+#fixed-text {
+    color: rgb(99, 53, 35);
+}
+
+#moving-text {
+    color: white;
+}
+
+#progress-bar-container {
+    display: inline-block;
+    vertical-align: middle;
+    width: 80%;
+    height: 40px;
+    background-color: #f3f3f3;
+    position: relative;  
+}
+
+#progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: rgb(99, 53, 35);
+    transition: width 1s;
+    position: relative;  
+}
+
+#moving-text {
+    position: absolute;
+    right: 5px;  
+    white-space: nowrap;  
+    top: 50%;  
+    transform: translateY(-50%);  
+}

@@ -90,7 +90,7 @@ The world is governed by humans
 -10 HOPE
 
 QANON 0.05: QAnon
-Donald Trump's primary struggle is to fight against Satan worshipping paedophiles
+Donald Trump's primary struggle is to fight against Satan worshipping sex offenders
 Donald Trump's primary struggle is that he is Donald Trump
 +5 CHEMTRAILS
 +5 GOVERNMENTS
