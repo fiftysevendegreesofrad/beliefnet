@@ -1,3 +1,4 @@
+cytoscape = require('cytoscape');
 function assert(bool) {
     if (!bool)
         throw "Assertion failed.";
@@ -73,3 +74,15 @@ function altNetworkLogLik(cy, nodesToChange) {
         cyClone.getElementById(nodeID).data("predicateValue", nodePredValue);
     return updateLogLik(cyClone);
 }
+module.exports = {
+    assert,
+    predicateToIndex,
+    predicateToOption,
+    getPredicateFromIndex,
+    nodeCoeffValue,
+    getSupportingEdgesCoeffs,
+    updateEdgeColoursGetNodeLogProb,
+    altNetworkLogLik,
+    updateLogLik,
+    computeBelievabilityFromLogLik
+};

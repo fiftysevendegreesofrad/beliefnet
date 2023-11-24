@@ -13,12 +13,14 @@ The world is governed by humans
 +5 CHEMTRAILS
 +5 BIRDS
 -10 HOPE
++1 OUTSIDER
 
 QANON 0.05: QAnon
 Donald Trump's primary struggle is to fight against Satan worshipping paedophiles
 Donald Trump's primary struggle is that he is Donald Trump
 +5 CHEMTRAILS
 +5 GOVERNMENTS
++5 OUTSIDER
 
 GOVERNMENTS 0.2: Governments
 Governments are the tools of a secret evil world order
@@ -26,12 +28,15 @@ Governments are no more competent or moral than the rest of us
 Governments can be trusted 
 +5 COMPETENT
 +1 PHARMA
++3 EXPERTSEVIL
 
 BIRDS 0.01: Birds
 All birds have been replaced with robot surveillance drones
 Birds are just birds
 +5 GOVERNMENTS
 +5 FIVEG
++1 OUTSIDER
++5 EXPERTSEVIL
 
 FIVEG 0.05: 5G
 Disease is caused by 5G phone masts
@@ -39,6 +44,8 @@ Disease is caused by germs, viruses, etc
 +5 CHEMTRAILS
 +5 GOVERNMENTS
 -5 HOPE
++1 OUTSIDER
++5 EXPERTSEVIL
 
 CHEMTRAILS 0.1: Chemtrails
 Trails left behind jets are chemtrails used for mind control
@@ -46,6 +53,8 @@ Trails left behind jets are condensed water called contrails
 +5 PHARMA
 +5 GOVERNMENTS
 -5 HOPE
++1 OUTSIDER
++5 EXPERTSEVIL
 
 PHARMA 0.5: Big Pharma
 Big pharma is the tool of a secret world order
@@ -53,12 +62,14 @@ Big pharma does not always act in the interests of the patient
 Large medical research corporations are trustworthy
 +1 IBSCURE
 +5 HOMEOPATHY
++5 EXPERTSEVIL
 
 HOMEOPATHY 0.3: Homeopathy
 Homeopathy definitely works
 Science has proven nothing about homeopathy, but one day it might
 Homeopathy is indistinguishable from placebo, we're done here
 +10 IBSCURE
++5 EXPERTSWRONG
 
 COMPETENT 0.5: I got fired 
 I got fired because the elite are trying to suppress me 
@@ -75,6 +86,36 @@ My Irritable Bowel Syndrome is incurable
 HOPE 0.9: Hope
 There is hope for me! 
 There is no hope for me!
+
+OUTSIDER 0.1: Outsider
+I am an outsider not accepted by the mainstream; the only people who will understand me are other outsiders
+I am a conventional member of society
++5 NORESPECT
++1 REPTILES
++1 QANON
++1 BIRDS
++1 FIVEG
++1 CHEMTRAILS
+
+NORESPECT 0.5: Respect
+My friends treat me with disdain for thinking differently
+My friends respect our differences of opinion
+
+EXPERTSWRONG 0.5: Expertise
+Anyone who can make YouTube videos is an expert, and I can become one myself by watching them
+Experts are sometimes wrong, but if they have spent many years studying a topic, they have a better chance of being right than I do
+Experts should always be trusted
++3 PHARMA
++3 GOVERNMENTS
++2 COMPETENT
+
+EXPERTSEVIL 0.05: Expert Conspiracy
+Experts are part of a conspiracy to suppress the truth
+Most experts are trying to get things right
++3 PHARMA
++3 GOVERNMENTS
++3 EXPERTSWRONG
++3 QANON
 
 `
     if (debug) text=`
@@ -112,7 +153,7 @@ Trails left behind jets are condensed water called contrails
 HOPE 0.9: Hope
 There is hope for me! 
 There is no hope for me!
-       
+
 `
     let lines = text.split("\n");
     let elements = {nodes: [], edges: []};
@@ -156,3 +197,5 @@ There is no hope for me!
     }
     return elements;
 }
+
+module.exports = {load_elements, PERMITTEDMINLOGPROB};
