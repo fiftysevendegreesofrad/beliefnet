@@ -47,16 +47,10 @@ function updateEdgeColoursGetNodeLogProb(n) {
     return logProb;
 }
 function computeBelievabilityFromLogLik(logLik) {
-    //believability is a scale of two parts. 
-    //0-50% maps MINLOGPROB to PERMITTEDMINLOGPROB
-    //50-100% maps PERMITTEDMINLOGPROB to MAXLOGPROB
-    //You might ask why this is not done in probability space, not log probability space.
+    //You might ask why this is done in log probability space, not probability space.
     //It just doesn't work so well for a display that way.
-    let believability;
-    if (logLik < PERMITTEDMINLOGPROB)
-        believability = (logLik - MINLOGPROB) / (PERMITTEDMINLOGPROB - MINLOGPROB) * 50;
-    else
-        believability = 50 + (logLik - PERMITTEDMINLOGPROB) / (MAXLOGPROB - PERMITTEDMINLOGPROB) * 50;
+    const MAXLOGPROB = 0;
+    let believability = (logLik - PERMITTEDMINLOGPROB) / (MAXLOGPROB - PERMITTEDMINLOGPROB) * 100;
     
     //round to 1 decimal place
     return believability.toFixed(1);
