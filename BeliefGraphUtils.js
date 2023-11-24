@@ -14,9 +14,14 @@ function getPredicateFromIndex(node, index) {
 function nodeCoeffValue(node) {
     return (node.data("predicateValue") * 2 - 1);
 }
-function computeNodeMutualSupport(n1, n2) {
-    let weight = n1.edgesWith(n2).data("weight");
-    return nodeCoeffValue(n1) * nodeCoeffValue(n2) * weight;
+function getSupportingEdgesCoeffs(node)
+{
+    let supportingEdgesCoeffs = [];
+    for (e of node.incomers("edge")) {
+        let support = nodeCoeffValue(node) * nodeCoeffValue(e.source()) * e.data("weight");
+        supportingEdgesCoeffs.push([e, support]);
+    }
+    return supportingEdgesCoeffs;
 }
 function updateEdgeColoursGetNodeLogProb(n) {
     //console.log(" "+n.data("label")+" "+predicateToOption(n, n.data("predicateValue")));
@@ -24,22 +29,14 @@ function updateEdgeColoursGetNodeLogProb(n) {
     let altLogOdds = Math.log(baseProb / (1 - baseProb));
     let nodeLogOdds = altLogOdds*nodeCoeffValue(n);
     //console.log("  alt-baseprob "+baseProb+" alt-logodds "+altLogOdds+" option-logodds "+nodeLogOdds);
-    let linkedEdges = [];
-    for (e of n.incomers("edge")) 
-        linkedEdges.push([e, e.source()]);
-    //uncomment to make all edges bidirectional
-    //for (e of n.outgoers("edge"))
-    //    linkedEdges.push([e, e.target()]);
     
-    for (let [e, otherNode] of linkedEdges)
+    for (let [e, nodeSupport] of getSupportingEdgesCoeffs(n))
     {
-        assert(otherNode!==n);
-        let nodeMutualSupport = computeNodeMutualSupport(n, otherNode);
         //console.log("  mutual support from "+otherNode.data("label")+" "+nodeMutualSupport);
-        nodeLogOdds += nodeMutualSupport;
-        if (nodeMutualSupport > 0)
+        nodeLogOdds += nodeSupport;
+        if (nodeSupport > 0)
             e.data("color", "green");
-        else if (nodeMutualSupport < 0)
+        else if (nodeSupport < 0)
             e.data("color", "red");
         else
             e.data("color", "grey");
@@ -70,7 +67,7 @@ function updateLogLik(cy) {
         let logProb = updateEdgeColoursGetNodeLogProb(n);
         n.data("logprob", logProb);
         let baseLogProb = Math.log(n.data("baseProb"));
-        n.data("displaylabel", n.data("label")+baseLogProb.toFixed(1)+" "+logProb.toFixed(1));
+        //n.data("displaylabel", n.data("label")+baseLogProb.toFixed(1)+" "+logProb.toFixed(1));
         logLik += logProb;
     }
     return logLik;

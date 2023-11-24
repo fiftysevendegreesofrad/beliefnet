@@ -180,8 +180,8 @@
 						button.addEventListener("click", function(evt1){
 							node.data("researched",true);
 							//iterate through neighbouring nodes
-							for (n of node.openNeighborhood("node"))
-								n.style("display","element");
+							for (e of node.incomers())
+								e.source().style("display","element");
 							refreshNodeDetails(node);
 							updateGraphDisplay(cy);
 						});
@@ -192,20 +192,20 @@
 						let supportingBeliefs = [];
 						let opposingBeliefs = [];
 						let neutralBeliefs = [];
-						for (n of node.openNeighborhood("node"))
+						for (let [e, nodeSupport] of getSupportingEdgesCoeffs(node))
 						{
-							let mutualSupport = computeNodeMutualSupport(node,n);
+							let n = e.source();
 							let otherBelief = n.data().displaylabel+": "+n.data().options[predicateToIndex(n)];
-							if (mutualSupport>0)
-								supportingBeliefs.push([mutualSupport,otherBelief]);
-							else if (mutualSupport<0)
-								opposingBeliefs.push([mutualSupport,otherBelief]);
+							if (nodeSupport>0)
+								supportingBeliefs.push([nodeSupport,otherBelief]);
+							else if (nodeSupport<0)
+								opposingBeliefs.push([nodeSupport,otherBelief]);
 							else
-								neutralBeliefs.push([mutualSupport,otherBelief]);
+								neutralBeliefs.push([nodeSupport,otherBelief]);
 						}
 						if (supportingBeliefs.length>0)
 						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Supporting:</h3>";
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently supporting this belief:</h3>";
 							let list = document.createElement("ul");
 							for (let [mutualSupport,otherBelief] of supportingBeliefs)
 							{
@@ -215,7 +215,7 @@
 						}
 						if (opposingBeliefs.length>0)
 						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Opposing:</h3>";
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently opposing this belief:</h3>";
 							let list = document.createElement("ul");
 							for (let [mutualSupport,otherBelief] of opposingBeliefs)
 							{
@@ -225,7 +225,7 @@
 						}
 						if (neutralBeliefs.length>0)
 						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently Neutral:</h3>";
+							document.getElementById("ResearchButton").innerHTML+="<h3>Currently neutral:</h3>";
 							let list = document.createElement("ul");
 							for (let [mutualSupport,otherBelief] of neutralBeliefs)
 							{
@@ -329,7 +329,7 @@
 			</ul>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
-			<h2>Subject's Related Beliefs:</h2>
+			<h2>Beliefs influencing this one:</h2>
 			<div id="ResearchButton"></div>
 		</div>
 		<div class="col-sm-6">
