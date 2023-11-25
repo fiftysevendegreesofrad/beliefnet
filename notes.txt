@@ -1,0 +1,23 @@
+FAQ
+
+Do you really think that's how people fall for conspiracies? I don't.
+
+The primary aim of this project was to make a playable game that teaches something about critical thinking (so if you're asking that question, it might mean I'm succeeding already). It was not to make the most realistic model of human belief. In any case, everyone is different, but I did want to make something sort of plausible for one person.
+
+"Bold of you to assume there's any logic in conspiracy thinking", to summarize some feedback from friends. But actually I'll dispute that point. People who fall for conspiracies somehow manage to process incoming information and make sensible decisions all the time, for example, by not stepping out into fast moving traffic. Some of them even have very successful careers. I think the difference is that when a belief has no consequence (unlike, say, the beliefs we have about safe ways to cross the road), then they can get a bit bizarre and people have no incentive to correct them. People can even do weird stuff like believe they believe something, even though they don't really. But sometimes they do really believe things, strongly enough, for example, to storm the US Senate.
+
+What is the logic model underlying the game, anyway?
+
+The likelihood of each belief is computed by logit regression - a very standard way of predicting probabilities, which is traditionally used to do things like figure out your insurance premium. The bullshitometer computes how unlikely all the current beliefs are in combination. It uses a log scale, not a linear one, as that seems to make better gameplay.
+
+You clearly believe/imply that XYZ is a crazy belief. I think you should reconsider; here are the reasons why you should believe XYZ.
+
+Firstly, don't assume I think all the non-mainstream beliefs in this game are crazy.
+
+Secondly, I don't care anyway; what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. 
+
+DEV NOTES
+
+Test 1
+Can't display outcome before clicking or people won't think about the text, it's just a logic puzzle.
+People get confused by why they can't select a belief that has full support.
