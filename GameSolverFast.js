@@ -124,12 +124,14 @@ class GameStateLogProbCache {
         this.cache.set(node,logProb);
         return logProb;
     }
+    prohibit(node) {
+        this.cache.set(node,Number.NEGATIVE_INFINITY);
+    }
 }
-function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startNode, isEndNode) {
+function findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode) {
     //NOTE this works on the game state graph, not the beliefNet graph which is used to calculate weights on the game state graph
     let queue = new PriorityQueue({ comparator: function(b, a) { return a.compare(b); }});
     let gameStateBestPaths = new StateMap();
-    let gameStateLogProbs = new GameStateLogProbCache(beliefNet);
     let startSearchState = SearchState.getFirst(startNode,gameStateLogProbs);
     output("Starting search from "+startNode+" with logprob "+startSearchState.minLogProb+".");
     queue.queue(startSearchState);
@@ -145,12 +147,19 @@ function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startN
             output("let PERMITTEDMINLOGPROB="+searchState.minLogProb+";");
             let path = [];
             let current = searchState;
+            let unlikliestState = current;
+            let unlikliestLogProb = gameStateLogProbs.get(current.node);
             path.push(gameStateLogProbs.get(current.node));
             while (current.backtrace != null) {
                 let after = current;
                 current = current.backtrace;
                 path.push(describeStateChange(beliefNet,current.node,after.node));
                 path.push(gameStateLogProbs.get(current.node));
+                if (gameStateLogProbs.get(current.node) < unlikliestLogProb)
+                {
+                    unlikliestState = current;
+                    unlikliestLogProb = gameStateLogProbs.get(current.node);
+                }
             }
             path.reverse();
             for (p of path)
@@ -164,7 +173,7 @@ function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startN
                     //get option from predicate                  
                     output(predicateToOption(beliefNet.nodes[i],finalState[i]));
                 }
-            return;
+            return unlikliestState;
         }
         let outgoingStates = searchState.getOutgoing(gameStateBestPaths, gameStateLogProbs, predicateArrayOutgoingFunction);
         for (s of outgoingStates) {
@@ -211,6 +220,10 @@ async function main() {
     //set endnode to be any node where the first predicate is true
     let isEndNode = (node) => node[0]==1;
 
-    findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startNode, isEndNode);
+    let gameStateLogProbs = new GameStateLogProbCache(beliefNet);
+    let unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
+    //gameStateLogProbs.prohibit(unlikliestState.node);
+    //unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
+
 }
 main();
