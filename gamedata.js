@@ -1,4 +1,4 @@
-const PERMITTEDMINLOGPROB = -5.74; //for restricting moves; derived from game analysis
+const PERMITTEDMINLOGPROB = -7.1; //for restricting moves; derived from game analysis
 
 async function load_elements(debug=false)
 {

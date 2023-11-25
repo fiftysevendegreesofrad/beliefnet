@@ -1,26 +1,18 @@
 const {load_elements, } = require('./gamedata');
-const {
-    assert,
-    predicateToIndex,
-    predicateToOption,
-    getPredicateFromIndex,
-    nodeCoeffValue,
-    getSupportingEdgesCoeffs,
-    updateEdgeColoursGetNodeLogProb,
-    altNetworkLogLik,
-    updateLogLik,
-    computeBelievabilityFromLogLik
-} = require('./BeliefGraphUtils');
 const PriorityQueue = require('./priority-queue.min');
 
 async function output(text) {
-    console.log(text);
+    process.stdout.write(""+text+"\n");
 }
 async function progressReport(text) {
     process.stdout.write(text+"\r");
 }
 function probToLogOdds(prob) {
     return Math.log(prob / (1 - prob));
+}
+function stateToInteger(state) {
+    const stateBase3 = state.map(x => x+1);
+    return stateBase3.reduce((a,b) => a*3+b);
 }
 function getPredicateArrayLogProb(beliefNetGraph,predicateArray) {
     const altLogOdds = beliefNetGraph.nodes.map(x => probToLogOdds(x.data.baseProb));
@@ -38,15 +30,23 @@ function getPredicateArrayLogProb(beliefNetGraph,predicateArray) {
     const logProb = logProbs.reduce((a,b) => a+b);
     return logProb;
 }
+//FIXME the following two funcs use a different definition of 'predicate' to BeliefGraphUtils.js
+//also there is duplicated functionality
+function predicateToIndex(node, predicateValue) {
+    const numOptions = node.data.options.length;
+    const p = (predicateValue + 1) / 2;
+    return (1 - p) * (node.data.options.length - 1);
+}
+function predicateToOption(node, predicateValue) {
+    return node.data.options[predicateToIndex(node, predicateValue)];
+}  
 function describeStateChange(beliefNetGraph,before,after)
 {
     let result = "";
     for (let i = 0; i < before.length; i++)
         if (before[i] != after[i])
         {
-            let options = beliefNetGraph.nodes[i].data.options;
-            let index = (1 - after[i]) * (options.length - 1);
-            result += options[index]+" ";
+            result += predicateToOption(beliefNetGraph.nodes[i],after[i])+" ";
         }
     return result;
 }
@@ -74,7 +74,7 @@ class SearchState {
             
             let potentialNewSearchState = new SearchState(n,newSteps,this,newMinLogProb);
             let nodeUnexplored = !(nodeBestSearchStates.has(n));
-            if (nodeUnexplored || potentialNewSearchState.compare(nodeBestSearchStates[n]) > 0)
+            if (nodeUnexplored || potentialNewSearchState.compare(nodeBestSearchStates.get(n)) > 0)
                 outgoingStates.push(potentialNewSearchState);
         }
         return outgoingStates;
@@ -92,9 +92,29 @@ class SearchState {
         return 0;
     }
 }
+class StateMap {
+    //map class that indexes of state arrays
+    constructor() {
+        this.map = new Map();
+    }
+    get(state) {
+        const index = stateToInteger(state);
+        if (this.map.has(index))
+            return this.map.get(index);
+        return null;
+    }
+    set(state, value) {
+        const index = stateToInteger(state);
+        this.map.set(index,value);
+    }
+    has(state) {
+        const index = stateToInteger(state);
+        return this.map.has(index);
+    }
+}
 class GameStateLogProbCache {
     constructor(bng) {
-        this.cache = new Map();
+        this.cache = new StateMap();
         this.beliefNetGraph = bng;
     }
     get(node) {
@@ -108,9 +128,10 @@ class GameStateLogProbCache {
 function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startNode, isEndNode) {
     //NOTE this works on the game state graph, not the beliefNet graph which is used to calculate weights on the game state graph
     let queue = new PriorityQueue({ comparator: function(b, a) { return a.compare(b); }});
-    let gameStateBestPaths = new Map();
+    let gameStateBestPaths = new StateMap();
     let gameStateLogProbs = new GameStateLogProbCache(beliefNet);
     let startSearchState = SearchState.getFirst(startNode,gameStateLogProbs);
+    output("Starting search from "+startNode+" with logprob "+startSearchState.minLogProb+".");
     queue.queue(startSearchState);
     gameStateBestPaths[startNode] = startSearchState;
     let iterations=0;
@@ -140,13 +161,7 @@ function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startN
             for (let i = 0; i < finalState.length; i++)
                 if (finalState[i] != 1)
                 {
-                    //get option from predicate
-                    function predicateToIndex(node, predicateValue) {
-                        return (1 - predicateValue) * (node.data.options.length - 1);
-                    }
-                    function predicateToOption(node, predicateValue) {
-                        return node.data.options[predicateToIndex(node, predicateValue)];
-                    }                    
+                    //get option from predicate                  
                     output(predicateToOption(beliefNet.nodes[i],finalState[i]));
                 }
             return;
@@ -154,7 +169,7 @@ function findMaxLikelihoodPath(beliefNet, predicateArrayOutgoingFunction, startN
         let outgoingStates = searchState.getOutgoing(gameStateBestPaths, gameStateLogProbs, predicateArrayOutgoingFunction);
         for (s of outgoingStates) {
             queue.queue(s);
-            gameStateBestPaths[s.node] = s;
+            gameStateBestPaths.set(s.node,s);
         }
     }
     output("No path found.");
@@ -170,7 +185,6 @@ function addNodeIndicesToEdges(beliefNet) {
     }
 }
 async function main() {
-
     let beliefNet = await load_elements(debug=false);
 
     addNodeIndicesToEdges(beliefNet);
@@ -191,8 +205,8 @@ async function main() {
         return outgoing;
     }
 
-    //startnode is array of 0s with length equal to number of predicates
-    let startNode = Array(beliefNetPredicateValues.length).fill(0);
+    //startnode is array of all the lowest predicate values
+    let startNode = beliefNetPredicateValues.map(x => x[0]);
 
     //set endnode to be any node where the first predicate is true
     let isEndNode = (node) => node[0]==1;

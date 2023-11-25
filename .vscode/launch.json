@@ -7,19 +7,13 @@
         {
             "type": "msedge",
             "request": "launch",
-            "name": "Open beliefnettest.html",
-            "file": "c:\\code\\beliefnet\\BeliefNetTest.html"
-        },
-        {
-            "type": "msedge",
-            "request": "launch",
             "name": "Open beliefnet.html",
             "file": "c:\\code\\beliefnet\\beliefnet.html"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Test on Node",
+            "name": "Test game on Node",
             "skipFiles": [
                 "<node_internals>/**"
             ],
