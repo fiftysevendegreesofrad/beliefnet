@@ -23,7 +23,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/GameSolver.js"
+            "program": "${workspaceFolder}/GameSolverFast.js"
         }
     ]
 }
