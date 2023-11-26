@@ -134,3 +134,9 @@ button {
     top: 50%;  
     transform: translateY(-50%);  
 }
+
+.optiontable td
+{
+    /* padding between rows */
+    padding-bottom: 10px;
+}

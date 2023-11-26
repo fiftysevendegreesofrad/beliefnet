@@ -2,340 +2,341 @@
 
 <html>
 
-	<head>
-		<title>BeliefNet</title>
+<head>
+	<title>BeliefNet</title>
 
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	  
-		<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-		<!--polyfills are needed for this extension for old browsers like IE -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.5.7/shim.min.js"></script>
+	<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 
-		<script src="https://unpkg.com/layout-base/layout-base.js"></script>
-		<script src="https://unpkg.com/avsdf-base/avsdf-base.js"></script>
-		<script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
+	<!--polyfills are needed for this extension for old browsers like IE -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.5.7/shim.min.js"></script>
 
-		<script src="gamedata.js"></script>
-		<script src="BeliefGraphUtils.js"></script>
+	<script src="https://unpkg.com/layout-base/layout-base.js"></script>
+	<script src="https://unpkg.com/avsdf-base/avsdf-base.js"></script>
+	<script src="https://unpkg.com/cytoscape-avsdf/cytoscape-avsdf.js"></script>
+
+	<script src="gamedata.js"></script>
+	<script src="BeliefGraphUtils.js"></script>
 
 
-		<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css">
 
-		<script>
-			let DEVMODE = true;
-			let nodeDisplay = DEVMODE?"element":"none";
+	<script>
+		let DEVMODE = false;
+		let nodeDisplay = DEVMODE ? "element" : "none";
 
-			let narrative = [];
-			function updateProgressBar(percentage) {
-				let progressBar = document.getElementById("progress-bar");
-				progressBar.style.width = percentage + "%";
+		let narrative = [];
+		function updateProgressBar(percentage) {
+			let progressBar = document.getElementById("progress-bar");
+			progressBar.style.width = percentage + "%";
+		}
+		function updateBelievabilityDisplay(cy) {
+			let logLik = updateLogLik(cy);
+			let believability = computeBelievabilityFromLogLik(logLik);
+			let bullshit = 100 - believability;
+			document.getElementById("moving-text").textContent = bullshit.toFixed(1) + "%";
+			updateProgressBar(bullshit);
+			if (DEVMODE)
+				document.getElementById("moving-text").textContent += " " + logLik.toFixed(2);
+			cy.resize();
+		}
+		function stringListToTableRow(list) {
+			let row = document.createElement("tr");
+
+			for (let i = 0; i < list.length; i++) {
+				let cell = document.createElement("td");
+				cell.innerHTML = list[i];
+				row.appendChild(cell);
 			}
-			function updateBelievabilityDisplay(cy)
-			{
-				let logLik = updateLogLik(cy);
-				let believability = computeBelievabilityFromLogLik(logLik);
-				let bullshit = 100-believability;
-				document.getElementById("moving-text").textContent = bullshit.toFixed(1)+"%";
-				updateProgressBar(bullshit);
-				if (DEVMODE)
-					document.getElementById("moving-text").textContent += " "+logLik.toFixed(2);
-				cy.resize();
-			}
-			function stringListToTableRow(list) {
-				let row = document.createElement("tr");
+			return row;
+		}
+		function updateNarrativeDisplay() {
+			let table = document.createElement("table");
 
-				for (let i = 0; i < list.length; i++) {
-					let cell = document.createElement("td");
-					cell.innerHTML = list[i];
-					row.appendChild(cell);
+			for (let i = 0; i < narrative.length; i++) {
+				let message = narrative[i].message;
+				let undo = narrative[i].undo;
+				let logLik = narrative[i].logLik;
+				let prevLogLik = narrative[i].prevLogLik;
+				let llDiff = (logLik - prevLogLik).toFixed(2);
+				if (llDiff >= 0)
+					llDiff = "+" + llDiff;
+
+				let row = stringListToTableRow(["<button onclick='revert(" + undo + ")'>Undo</button>",
+				logLik.toFixed(2), "(" + llDiff + ")", message]);
+
+				table.appendChild(row);
+			}
+			document.getElementById("narrative").innerHTML = "";
+			document.getElementById("narrative").appendChild(table);
+		}
+		function updateGraphDisplay(cy) {
+			let visibleNodes = cy.nodes(":visible");
+			let layoutOptions = {
+				name: 'avsdf',
+				nodeSeparation: 120,
+				animate: "end",
+				animationDuration: 1000,
+				animationEasing: 'ease-in-out',
+				nodeSeparation: 120,
+				eles: visibleNodes
+			};
+			cy.layout(layoutOptions).run();
+		}
+		document.addEventListener('DOMContentLoaded', async function () {
+
+			let elements = await load_elements();
+			let maxweight = elements.edges.map(x => x.data.absweight).reduce((a, b) => Math.max(a, b));
+
+			var cy = window.cy = cytoscape({
+				container: document.getElementById('cy'),
+
+				style: [
+					{
+						selector: 'node',
+						style: {
+							'label': 'data(displaylabel)',
+							'text-valign': 'center',
+							'color': '#000000',
+							'width': 'mapData(logprob,-3,0,60,20)',
+							'height': 'mapData(logprob,-3,0,60,20)',
+							'pie-1-background-color': 'mapData(predicateValue, 0, 1, blue, purple)',
+							'pie-1-background-size': 'mapData(baseProb,0,1,0,100)',
+							'pie-2-background-color': 'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
+							'pie-2-background-size': 'mapData(baseProb,0,1,100,0)',
+							'display': nodeDisplay
+						}
+					},
+					{
+						selector: 'node[predicateValue=0.5]',
+						style: {
+							'pie-1-background-color': '#444444',
+							'pie-2-background-color': '#aaaaaa',
+						}
+					},
+					{
+						selector: 'node[researched=0]',
+						style: {
+							'border-width': '10px',
+							'border-color': '#aaaaaa',
+							'border-style': 'dotted'
+						}
+					},
+					{
+						selector: 'node[researched=1]',
+						style: {
+							'border-width': '0px',
+						}
+					},
+					{
+						selector: 'edge',
+						style: {
+							'width': 'mapData(absweight, 0, ' + maxweight + ', 0, 7)',
+							'line-color': 'data(color)',
+							'opacity': 0.5,
+							'target-arrow-shape': 'triangle',
+							'target-arrow-color': 'data(color)',
+							//'source-arrow-shape': 'triangle',
+							//'source-arrow-color': 'data(color)',
+							'curve-style': 'unbundled-bezier',
+							'control-point-distances': '10px',
+							'control-point-weights': '0.5',
+							'label': 'data(weight)'
+						}
+					}
+				],
+
+				elements: elements,
+				autounselectify: true,
+				autoungrabify: true,
+				userZoomingEnabled: false,
+				userPanningEnabled: false
+			});
+			let firstNode = cy.nodes().first();
+			firstNode.style("display", "element");
+			refreshNodeDetails(firstNode);
+			updateGraphDisplay(cy);
+			updateLogLik(cy); //call to initialize node logprobs
+			updateBelievabilityDisplay(cy);
+
+			cy.bind('click', 'node', function (evt) {
+				let node = evt.target;
+				displayNodeDetails(node);
+			});
+
+			function refreshNodeDetails(node) {
+				var leftPanel = document.getElementsByClassName("left-panel")[0];
+				leftPanel.classList.remove("show");
+				setTimeout(function () { displayNodeDetails(node); }, 350);
+			}
+			function displayNodeDetails(node) {
+				var leftPanel = document.getElementsByClassName("left-panel")[0];
+				leftPanel.classList.add("show");
+				document.getElementById("topic").innerHTML = node.data("displaylabel");
+				let options = node.data().options;
+				let whichSelected = predicateToIndex(node);
+				let predicateValue = node.data("predicateValue");
+				let color = predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
+				document.getElementById("currentBelief").innerHTML = "<font color=" + color + "><b>" + options[whichSelected] + "</b></font>";
+
+				//create research button
+				document.getElementById("ResearchButton").innerHTML = "";
+				if (node.data("researched")==0) {
+					let button = document.createElement("button");
+					button.innerHTML = "Research Influencing Beliefs";
+					button.addEventListener("click", function (evt1) {
+						node.data("researched", 1);
+						//iterate through neighbouring nodes
+						for (e of node.incomers())
+							e.source().style("display", "element");
+						refreshNodeDetails(node);
+						updateGraphDisplay(cy);
+					});
+					document.getElementById("ResearchButton").appendChild(button);
 				}
-				return row;
-			}
-			function updateNarrativeDisplay()
-			{
+				else {
+					let supportingBeliefs = [];
+					let opposingBeliefs = [];
+					let neutralBeliefs = [];
+					for (let [e, nodeSupport] of getSupportingEdgesCoeffs(node)) {
+						let n = e.source();
+						let otherBelief = n.data().displaylabel + ": " + n.data().options[predicateToIndex(n)];
+						if (nodeSupport > 0)
+							supportingBeliefs.push([nodeSupport, otherBelief]);
+						else if (nodeSupport < 0)
+							opposingBeliefs.push([nodeSupport, otherBelief]);
+						else
+							neutralBeliefs.push([nodeSupport, otherBelief]);
+					}
+					if (supportingBeliefs.length > 0) {
+						document.getElementById("ResearchButton").innerHTML += "<h3>Currently supporting this belief:</h3>";
+						let list = document.createElement("ul");
+						for (let [mutualSupport, otherBelief] of supportingBeliefs) {
+							list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + "</font></li>";
+						}
+						document.getElementById("ResearchButton").appendChild(list);
+					}
+					if (opposingBeliefs.length > 0) {
+						document.getElementById("ResearchButton").innerHTML += "<h3>Currently opposing this belief:</h3>";
+						let list = document.createElement("ul");
+						for (let [mutualSupport, otherBelief] of opposingBeliefs) {
+							list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + "</font></li>";
+						}
+						document.getElementById("ResearchButton").appendChild(list);
+					}
+					if (neutralBeliefs.length > 0) {
+						document.getElementById("ResearchButton").innerHTML += "<h3>Currently neutral:</h3>";
+						let list = document.createElement("ul");
+						for (let [mutualSupport, otherBelief] of neutralBeliefs) {
+							list.innerHTML += "<li>" + otherBelief + "</li>";
+						}
+						document.getElementById("ResearchButton").appendChild(list);
+					}
+				}
+				//create buttons for other options
+				document.getElementById("nodeDetails").innerHTML = "";
+				let prevNodeValues = cy.elements().map(x => x.json()); //for undo not yet implemented
 				let table = document.createElement("table");
+				for (let i = 0; i < options.length; i++) {
+					let row = document.createElement("tr");
+					row.classList.add("optiontable");
 
-				for (let i=0;i<narrative.length;i++)
-				{
-					let message = narrative[i].message;
-					let undo = narrative[i].undo;
-					let logLik = narrative[i].logLik;
-					let prevLogLik = narrative[i].prevLogLik;
-					let llDiff = (logLik-prevLogLik).toFixed(2);
-					if (llDiff>=0)
-						llDiff = "+"+llDiff;
 
-					let row = stringListToTableRow(["<button onclick='revert(" + undo + ")'>Undo</button>",
-						logLik.toFixed(2), "("+llDiff+")", message]);
-						
-					table.appendChild(row);				
-				}
-				document.getElementById("narrative").innerHTML = "";
-				document.getElementById("narrative").appendChild(table);
-			}
-			function updateGraphDisplay(cy)
-			{
-				let visibleNodes = cy.nodes(":visible");
-				let layoutOptions = {
-						name: 'avsdf',
-						nodeSeparation: 120,
-						animate: "end",
-						animationDuration: 1000,
-						animationEasing: 'ease-in-out',
-						nodeSeparation: 120,
-						eles:visibleNodes
-					};
-				cy.layout(layoutOptions).run();
-			}
-			document.addEventListener('DOMContentLoaded', async function(){
+					let optionSpan = document.createElement("span");
+					optionSpan.innerHTML = options[i];
 
-				let elements = await load_elements();
-				let maxweight = elements.edges.map(x=>x.data.absweight).reduce((a,b)=>Math.max(a,b));
-
-				var cy = window.cy = cytoscape({
-					container: document.getElementById('cy'),
-
-					style: [
-						{
-							selector: 'node',
-							style: {
-								'label': 'data(displaylabel)',
-								'text-valign': 'center',
-								'color': '#000000',
-								'width': 'mapData(logprob,-6,0,50,20)',
-								'height': 'mapData(logprob,-6,0,50,20)',
-								'pie-1-background-color':'mapData(predicateValue, 0, 1, blue, purple)',
-								'pie-1-background-size':'mapData(baseProb,0,1,0,100)',
-								'pie-2-background-color':'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
-								'pie-2-background-size':'mapData(baseProb,0,1,100,0)',
-								'display':nodeDisplay
-							}
-						},
-						{
-							selector: 'node[predicateValue=0.5]',
-							style: {
-								'pie-1-background-color':'#444444',
-								'pie-2-background-color':'#aaaaaa',
-							}
-						},
-						
-						{
-							selector: 'edge',
-							style: {
-								'width': 'mapData(absweight, 0, '+maxweight+', 0, 7)',
-								'line-color': 'data(color)',
-								'opacity': 0.5,
-								'target-arrow-shape': 'triangle',
-								'target-arrow-color': 'data(color)',
-								//'source-arrow-shape': 'triangle',
-								//'source-arrow-color': 'data(color)',
-								'curve-style': 'unbundled-bezier',
-								'control-point-distances': '10px',
-								'control-point-weights': '0.5',
-								'label':'data(weight)'
-							}
-						}
-					],
-
-					elements: elements,
-					autounselectify: true,
-					autoungrabify: true,
-					userZoomingEnabled: false,
-					userPanningEnabled: false
-				});
-				let firstNode = cy.nodes().first();
-				firstNode.style("display","element");
-				refreshNodeDetails(firstNode);
-				updateGraphDisplay(cy);
-				updateLogLik(cy); //call to initialize node logprobs
-				updateBelievabilityDisplay(cy);
-
-				cy.bind('click', 'node', function(evt) {
-					let node = evt.target;
-					displayNodeDetails(node);
-				});
-
-				function refreshNodeDetails(node)
-				{
-					var leftPanel = document.getElementsByClassName("left-panel")[0];
-					leftPanel.classList.remove("show");
-					setTimeout(function() {displayNodeDetails(node);}, 350);
-				}
-				function displayNodeDetails(node)
-				{
-					var leftPanel = document.getElementsByClassName("left-panel")[0];
-					leftPanel.classList.add("show");
-					document.getElementById("topic").innerHTML=node.data("displaylabel");
-					let options = node.data().options;
-					let whichSelected = predicateToIndex(node);
-					let predicateValue = node.data("predicateValue");
-					let color = predicateValue==0.5?"#111111":(predicateValue>0.5?"purple":"blue");
-					document.getElementById("currentBelief").innerHTML="<font color="+color+"><b>"+options[whichSelected]+"</b></font>";
-
-					//create research button
-					document.getElementById("ResearchButton").innerHTML="";
-					if (!node.data("researched"))
-					{
-						let button = document.createElement("button");
-						button.innerHTML = "Research Influencing Beliefs";
-						button.addEventListener("click", function(evt1){
-							node.data("researched",true);
-							//iterate through neighbouring nodes
-							for (e of node.incomers())
-								e.source().style("display","element");
-							refreshNodeDetails(node);
-							updateGraphDisplay(cy);
-						});
-						document.getElementById("ResearchButton").appendChild(button);
-					}
-					else
-					{
-						let supportingBeliefs = [];
-						let opposingBeliefs = [];
-						let neutralBeliefs = [];
-						for (let [e, nodeSupport] of getSupportingEdgesCoeffs(node))
-						{
-							let n = e.source();
-							let otherBelief = n.data().displaylabel+": "+n.data().options[predicateToIndex(n)];
-							if (nodeSupport>0)
-								supportingBeliefs.push([nodeSupport,otherBelief]);
-							else if (nodeSupport<0)
-								opposingBeliefs.push([nodeSupport,otherBelief]);
-							else
-								neutralBeliefs.push([nodeSupport,otherBelief]);
-						}
-						if (supportingBeliefs.length>0)
-						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently supporting this belief:</h3>";
-							let list = document.createElement("ul");
-							for (let [mutualSupport,otherBelief] of supportingBeliefs)
-							{
-								list.innerHTML += "<li><font color=green>+"+mutualSupport+": "+otherBelief+"</font></li>";
-							}
-							document.getElementById("ResearchButton").appendChild(list);
-						}
-						if (opposingBeliefs.length>0)
-						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently opposing this belief:</h3>";
-							let list = document.createElement("ul");
-							for (let [mutualSupport,otherBelief] of opposingBeliefs)
-							{
-								list.innerHTML += "<li><font color=red>"+mutualSupport+": "+otherBelief+"</font></li>";
-							}
-							document.getElementById("ResearchButton").appendChild(list);
-						}
-						if (neutralBeliefs.length>0)
-						{
-							document.getElementById("ResearchButton").innerHTML+="<h3>Currently neutral:</h3>";
-							let list = document.createElement("ul");
-							for (let [mutualSupport,otherBelief] of neutralBeliefs)
-							{
-								list.innerHTML += "<li>"+otherBelief+"</li>";
-							}
-							document.getElementById("ResearchButton").appendChild(list);
-						}
-					}
-					//create buttons for other options
-					document.getElementById("nodeDetails").innerHTML="";
-					let prevNodeValues = cy.elements().map(x=>x.json()); //for undo not yet implemented
-					let table = document.createElement("table");
-					for (let i=0; i<options.length; i++)
-					{
-						if (i==whichSelected) continue;
-
-						let row = document.createElement("tr");
-
-						let optionSpan = document.createElement("span");
-						optionSpan.innerHTML = options[i];
-
-						let button = document.createElement("button");
+					let button = document.createElement("button");
+					if (i != whichSelected) {
 						let buttonPredValue = getPredicateFromIndex(node.data(), i);
 						button.innerHTML = "Influence";
 
 						let currentLogLik = updateLogLik(cy);
-						let resultingLogLik = altNetworkLogLik(cy,{[node.id()]:buttonPredValue});
+						let resultingLogLik = altNetworkLogLik(cy, { [node.id()]: buttonPredValue });
 						let resultingBelievability = computeBelievabilityFromLogLik(resultingLogLik);
-						
-						let possible = resultingLogLik>=PERMITTEDMINLOGPROB;
-						
-						if (possible)
-						{
-							if (DEVMODE)
-							{
-									button.style.backgroundColor = "green";
-									button.innerHTML = resultingLogLik.toFixed(2);
+
+						let possible = resultingLogLik >= PERMITTEDMINLOGPROB;
+
+						if (possible) {
+							if (DEVMODE) {
+								button.style.backgroundColor = "green";
+								button.innerHTML = resultingLogLik.toFixed(2);
 							}
-							button.addEventListener("click", function(evt1){
-								node.data("predicateValue",buttonPredValue); 
-								narrative.push({message:options[i], 
-									logLik:resultingLogLik, prevLogLik:currentLogLik, undo:prevNodeValues});
+							button.addEventListener("click", function (evt1) {
+								node.data("predicateValue", buttonPredValue);
+								narrative.push({
+									message: options[i],
+									logLik: resultingLogLik, prevLogLik: currentLogLik, undo: prevNodeValues
+								});
 								updateBelievabilityDisplay(cy);
 								updateNarrativeDisplay();
 								refreshNodeDetails(node);
 							});
 						}
-						else
-						{
-							if (DEVMODE)
-							{
-									button.style.backgroundColor = "red";
-									button.innerHTML = resultingLogLik.toFixed(2);
+						else {
+							if (DEVMODE) {
+								button.style.backgroundColor = "red";
+								button.innerHTML = resultingLogLik.toFixed(2);
 							}
-							button.addEventListener("click", function(evt1){
+							button.addEventListener("click", function (evt1) {
 								//make modal popup
 								let modal = document.getElementById("myModal");
 								let span = document.getElementsByClassName("close")[0];
 								modal.style.display = "block";
-								span.onclick = function() {
+								span.onclick = function () {
 									modal.style.display = "none";
 								}
-								window.onclick = function(event) {
+								window.onclick = function (event) {
 									if (event.target == modal) {
 										modal.style.display = "none";
 									}
 								}
-								
+
 							});
 						}
-
-						let td = document.createElement("td");
-						td.appendChild(button);
-						row.appendChild(td);
-						let td2 = document.createElement("td");
-						td2.appendChild(optionSpan);
-						row.appendChild(td2);
-						table.appendChild(row);
 					}
-					document.getElementById("nodeDetails").appendChild(table);
+					else {
+						button.innerHTML = "<i>Current</i>";
+						button.disabled = true;
+					}
+
+					let td = document.createElement("td");
+					td.appendChild(button);
+					row.appendChild(td);
+					let td2 = document.createElement("td");
+					td2.appendChild(optionSpan);
+					row.appendChild(td2);
+					table.appendChild(row);
 				}
-				
+				document.getElementById("nodeDetails").appendChild(table);
+			}
 
 
-			});
-		</script>
-	</head>
 
-	<body>
-		<div class="header">
-			<span id="fixed-text">BULLSHITOMETER&nbsp;&nbsp;</span>
-			<div id="progress-bar-container">
-				<div id="progress-bar">
-					<span id="moving-text"></span>
-				</div>
+		});
+	</script>
+</head>
+
+<body>
+	<div class="header">
+		<span id="fixed-text">BULLSHITOMETER&nbsp;&nbsp;</span>
+		<div id="progress-bar-container">
+			<div id="progress-bar">
+				<span id="moving-text"></span>
 			</div>
 		</div>
-		
-		<!-- Panels -->
-		<div class="row">
+	</div>
+
+	<!-- Panels -->
+	<div class="row">
 		<div class="col-sm-3 left-panel">
 			<h1 id="topic"></h1>
 			<h2>Subject's Current Belief:</h2>
 			<ul>
-			<li id="currentBelief"></li>
+				<li id="currentBelief"></li>
 			</ul>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
@@ -349,18 +350,18 @@
 			<h1>Narrative</h1>
 			<div id="narrative"></div>
 		</div>
+	</div>
+
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<p>You efforts to influence this belief are not successful. They don't buy it. </p>
+			<p>You will need to build a narrative that starts with something more believable.
+			</p>
 		</div>
-		
-		<div id="myModal" class="modal">
-			<div class="modal-content">
-				<span class="close">&times;</span>
-				<p>You efforts to influence this belief are not successful. They don't buy it. </p>
-				<p>You will need to build a narrative that starts with something more believable.
-				</p>
-			</div>
-		</div>
-		
-		
-	</body>
+	</div>
+
+
+</body>
 
 </html>
