@@ -1,5 +1,5 @@
 const PERMITTEDMINLOGPROB = -7.1; //for restricting moves; derived from game analysis
-
+const CHARACTERNAME = "Bruto";
 async function load_elements(debug=false)
 {
     //let response = await fetch(new Request(filename));
@@ -182,7 +182,7 @@ There is no hope for me!
             line = lines.shift();
         }
         elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabel, baseProb: baseProb, options: options,
-            predicateValue: 0, logprob: 0, researched: 0}});
+            predicateValue: 0, logprob: 0, researched: 0, target: false}});
 
         //now we are expecting edges
         while(line.trim()!="")
@@ -195,6 +195,7 @@ There is no hope for me!
             line = lines.shift();
         }
     }
+    elements.nodes[0].data.target=true; //first node is the target
     return elements;
 }
 

@@ -88,6 +88,9 @@
 			cy.layout(layoutOptions).run();
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
+			document.querySelectorAll('.CharacterName').forEach(function(element) {
+				element.textContent = CHARACTERNAME;
+			});
 
 			let elements = await load_elements();
 			let maxweight = elements.edges.map(x => x.data.absweight).reduce((a, b) => Math.max(a, b));
@@ -247,7 +250,14 @@
 
 
 					let optionSpan = document.createElement("span");
-					optionSpan.innerHTML = options[i];
+					const isTargetOption = (node.data().target && i==0);
+					let htmlOption = "";
+					if (isTargetOption)
+						htmlOption+="<font class=target><u>GAME TARGET</u></font><br><font class=target>";
+					htmlOption += options[i];
+					if (isTargetOption)
+						htmlOption+='</font><br><i>(Your aim is to convince '+CHARACTERNAME+' of this)</i>';
+					optionSpan.innerHTML = htmlOption;
 
 					let button = document.createElement("button");
 					if (i != whichSelected) {
@@ -322,7 +332,7 @@
 
 <body>
 	<div class="header">
-		<span id="fixed-text">BULLSHITOMETER&nbsp;&nbsp;</span>
+		<span id="fixed-text"><span class="CharacterName"></span>'S<br>BULLSHITOMETER</span>
 		<div id="progress-bar-container">
 			<div id="progress-bar">
 				<span id="moving-text"></span>
@@ -334,13 +344,13 @@
 	<div class="row">
 		<div class="col-sm-3 left-panel">
 			<h1 id="topic"></h1>
-			<h2>Subject's Current Belief:</h2>
+			<h2><span class="CharacterName"></span>'s Current Belief:</h2>
 			<ul>
 				<li id="currentBelief"></li>
 			</ul>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
-			<h2>Beliefs influencing this one:</h2>
+			<h2><span class="CharacterName"></span>'s beliefs that influence this one:</h2>
 			<div id="ResearchButton"></div>
 		</div>
 		<div class="col-sm-6">
