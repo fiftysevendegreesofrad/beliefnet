@@ -150,3 +150,8 @@ button {
 .target {
     font-weight: bold;
 }
+
+.darkbg
+{
+    background-color: #444444;
+}

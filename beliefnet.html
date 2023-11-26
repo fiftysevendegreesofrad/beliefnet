@@ -176,6 +176,9 @@
 				leftPanel.classList.remove("show");
 				setTimeout(function () { displayNodeDetails(node); }, 350);
 			}
+			function predicateToTextColour(predicateValue) {
+				return predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
+			}
 			function displayNodeDetails(node) {
 				var leftPanel = document.getElementsByClassName("left-panel")[0];
 				leftPanel.classList.add("show");
@@ -183,8 +186,8 @@
 				let options = node.data().options;
 				let whichSelected = predicateToIndex(node);
 				let predicateValue = node.data("predicateValue");
-				let color = predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
-				document.getElementById("currentBelief").innerHTML = "<font color=" + color + "><b>" + options[whichSelected] + "</b></font>";
+				let color = predicateToTextColour(predicateValue);
+				document.getElementById("currentBelief").innerHTML = "<font color=" + color + "><b>"+CHARACTERNAME+" currently believes: " + options[whichSelected] + "</b></font>";
 
 				//create research button
 				document.getElementById("ResearchButton").innerHTML = "";
@@ -215,8 +218,14 @@
 						else
 							neutralBeliefs.push([nodeSupport, otherBelief]);
 					}
+					if (supportingBeliefs.length + opposingBeliefs.length + neutralBeliefs.length == 0) {
+						document.getElementById("ResearchButton").innerHTML += "<h3>No influencing beliefs found</h3>"
+													+"<p>This belief appears to stand alone.</p>"
+					}
+					else
+						document.getElementById("ResearchButton").innerHTML += "<h3>"+CHARACTERNAME+"'s other beliefs...</h3>";
 					if (supportingBeliefs.length > 0) {
-						document.getElementById("ResearchButton").innerHTML += "<h3>Currently supporting this belief:</h3>";
+						document.getElementById("ResearchButton").innerHTML += "<h3>...currently supporting this one:</h3>";
 						let list = document.createElement("ul");
 						for (let [mutualSupport, otherBelief] of supportingBeliefs) {
 							list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + "</font></li>";
@@ -224,7 +233,7 @@
 						document.getElementById("ResearchButton").appendChild(list);
 					}
 					if (opposingBeliefs.length > 0) {
-						document.getElementById("ResearchButton").innerHTML += "<h3>Currently opposing this belief:</h3>";
+						document.getElementById("ResearchButton").innerHTML += "<h3>...currently opposing this one:</h3>";
 						let list = document.createElement("ul");
 						for (let [mutualSupport, otherBelief] of opposingBeliefs) {
 							list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + "</font></li>";
@@ -232,7 +241,7 @@
 						document.getElementById("ResearchButton").appendChild(list);
 					}
 					if (neutralBeliefs.length > 0) {
-						document.getElementById("ResearchButton").innerHTML += "<h3>Currently neutral:</h3>";
+						document.getElementById("ResearchButton").innerHTML += "<h3>...that could affect this one, but currently don't:</h3>";
 						let list = document.createElement("ul");
 						for (let [mutualSupport, otherBelief] of neutralBeliefs) {
 							list.innerHTML += "<li>" + otherBelief + "</li>";
@@ -252,9 +261,10 @@
 					let optionSpan = document.createElement("span");
 					const isTargetOption = (node.data().target && i==0);
 					let htmlOption = "";
+					let color = predicateToTextColour(getPredicateFromIndex(node.data(), i));
 					if (isTargetOption)
-						htmlOption+="<font class=target><u>GAME TARGET</u></font><br><font class=target>";
-					htmlOption += options[i];
+						htmlOption+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=darkbg><font class=target color=ffff00><b>&nbsp;&darr; GAME TARGET &darr;&nbsp;</b></font></span><br><font class=target>";
+					htmlOption +=  "<font color="+color+">"+options[i]+"</font>";
 					if (isTargetOption)
 						htmlOption+='</font><br><i>(Your aim is to convince '+CHARACTERNAME+' of this)</i>';
 					optionSpan.innerHTML = htmlOption;
@@ -344,13 +354,10 @@
 	<div class="row">
 		<div class="col-sm-3 left-panel">
 			<h1 id="topic"></h1>
-			<h2><span class="CharacterName"></span>'s Current Belief:</h2>
-			<ul>
-				<li id="currentBelief"></li>
-			</ul>
+			<p id="currentBelief"></p>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
-			<h2><span class="CharacterName"></span>'s beliefs that influence this one:</h2>
+			
 			<div id="ResearchButton"></div>
 		</div>
 		<div class="col-sm-6">
