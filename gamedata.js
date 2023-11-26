@@ -118,43 +118,6 @@ Most experts are trying to get things right
 +3 QANON
 
 `
-    if (debug) text=`
-REPTILES 0.01: Reptilian Elite
-The world is governed by a secret elite of literal reptiles - actual lizard people
-The world is governed by humans
-+5 QANON
-+5 GOVERNMENTS
-+5 CHEMTRAILS
-+5 BIRDS
--10 HOPE
-
-QANON 0.05: QAnon
-Donald Trump's primary struggle is to fight against Satan worshipping sex offenders
-Donald Trump's primary struggle is that he is Donald Trump
-+5 CHEMTRAILS
-+5 GOVERNMENTS
-
-GOVERNMENTS 0.2: Governments
-Governments are the tools of a secret evil world order
-Governments are no more competent or moral than the rest of us 
-Governments can be trusted 
-
-BIRDS 0.01: Birds
-All birds have been replaced with robot surveillance drones
-Birds are just birds
-+5 GOVERNMENTS
-
-CHEMTRAILS 0.1: Chemtrails
-Trails left behind jets are chemtrails used for mind control
-Trails left behind jets are condensed water called contrails
-+5 GOVERNMENTS
--5 HOPE
-
-HOPE 0.9: Hope
-There is hope for me! 
-There is no hope for me!
-
-`
     let lines = text.split("\n");
     let elements = {nodes: [], edges: []};
     

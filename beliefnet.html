@@ -26,7 +26,8 @@
 	<link rel="stylesheet" href="style.css">
 
 	<script>
-		let DEVMODE = false;
+		const DEVMODE = true;
+		const ALLOWIMPOSSIBLEMOVES = false;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		let narrative = [];
@@ -43,6 +44,20 @@
 			if (DEVMODE)
 				document.getElementById("moving-text").textContent += " " + logLik.toFixed(2);
 			cy.resize();
+		}
+		function showModal(message) {			
+			let modal = document.getElementById("myModal");
+			let span = document.getElementsByClassName("close")[0];
+			modal.style.display = "block";
+			span.onclick = function () {
+				modal.style.display = "none";
+			}
+			window.onclick = function (event) {
+				if (event.target == modal) {
+					modal.style.display = "none";
+				}
+			}
+			document.getElementsByClassName("modal-message")[0].innerHTML = message;
 		}
 		function stringListToTableRow(list) {
 			let row = document.createElement("tr");
@@ -280,11 +295,18 @@
 
 						let possible = resultingLogLik >= PERMITTEDMINLOGPROB;
 
-						if (possible) {
-							if (DEVMODE) {
+						if (DEVMODE && possible) {
 								button.style.backgroundColor = "green";
 								button.innerHTML = resultingLogLik.toFixed(2);
 							}
+						if (DEVMODE && !possible) {
+							button.style.backgroundColor = "red";
+							button.innerHTML = resultingLogLik.toFixed(2);
+							if (ALLOWIMPOSSIBLEMOVES)
+								possible = true;
+						}
+						if (possible) {
+
 							button.addEventListener("click", function (evt1) {
 								node.data("predicateValue", buttonPredValue);
 								narrative.push({
@@ -294,27 +316,13 @@
 								updateBelievabilityDisplay(cy);
 								updateNarrativeDisplay();
 								refreshNodeDetails(node);
+								if (isTargetOption)
+									showModal("<h1>Well done</h1><p>You have convinced "+CHARACTERNAME+" of the target conspiracy.</p><p>Convinced that we are governed by reptiles, he goes out one day and stabs a zookeeper.</p><p>I hope you're proud of yourself.</p>");
 							});
 						}
 						else {
-							if (DEVMODE) {
-								button.style.backgroundColor = "red";
-								button.innerHTML = resultingLogLik.toFixed(2);
-							}
 							button.addEventListener("click", function (evt1) {
-								//make modal popup
-								let modal = document.getElementById("myModal");
-								let span = document.getElementsByClassName("close")[0];
-								modal.style.display = "block";
-								span.onclick = function () {
-									modal.style.display = "none";
-								}
-								window.onclick = function (event) {
-									if (event.target == modal) {
-										modal.style.display = "none";
-									}
-								}
-
+								showModal("You can't make this move (fixme give hints).");
 							});
 						}
 					}
@@ -357,7 +365,7 @@
 			<p id="currentBelief"></p>
 			<h2>Alternative Beliefs:</h2>
 			<p id="nodeDetails"></p>
-			
+
 			<div id="ResearchButton"></div>
 		</div>
 		<div class="col-sm-6">
@@ -370,11 +378,7 @@
 	</div>
 
 	<div id="myModal" class="modal">
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<p>You efforts to influence this belief are not successful. They don't buy it. </p>
-			<p>You will need to build a narrative that starts with something more believable.
-			</p>
+		<div class="modal-content"><span class='close'>&times;</span><span class="modal-message"></span>
 		</div>
 	</div>
 
