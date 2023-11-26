@@ -27,7 +27,7 @@
 
 	<script>
 		const DEVMODE = true;
-		const ALLOWIMPOSSIBLEMOVES = false;
+		const ALLOWIMPOSSIBLEMOVES = true;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		let narrative = [];
@@ -226,12 +226,21 @@
 					for (let [e, nodeSupport] of getSupportingEdgesCoeffs(node)) {
 						let n = e.source();
 						let otherBelief = n.data().displaylabel + ": " + n.data().options[predicateToIndex(n)];
+						const otherPredicate = n.data().predicateValue;
+
+						let narrative = "";
+						if (otherPredicate == 0) narrative = e.data().narrative[1];
+						else if (otherPredicate == 1) narrative = e.data().narrative[0];
+						if (narrative == undefined) narrative = "";
+						if (narrative!="")
+							narrative = " <i>" + narrative + "</i>";
+						
 						if (nodeSupport > 0)
-							supportingBeliefs.push([nodeSupport, otherBelief]);
+							supportingBeliefs.push([nodeSupport, otherBelief, narrative]);
 						else if (nodeSupport < 0)
-							opposingBeliefs.push([nodeSupport, otherBelief]);
+							opposingBeliefs.push([nodeSupport, otherBelief, narrative]);
 						else
-							neutralBeliefs.push([nodeSupport, otherBelief]);
+							neutralBeliefs.push([nodeSupport, otherBelief, narrative]);
 					}
 					if (supportingBeliefs.length + opposingBeliefs.length + neutralBeliefs.length == 0) {
 						document.getElementById("ResearchButton").innerHTML += "<h3>No influencing beliefs found</h3>"
@@ -242,24 +251,25 @@
 					if (supportingBeliefs.length > 0) {
 						document.getElementById("ResearchButton").innerHTML += "<h3>...currently supporting this one:</h3>";
 						let list = document.createElement("ul");
-						for (let [mutualSupport, otherBelief] of supportingBeliefs) {
-							list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + "</font></li>";
+						for (let [mutualSupport, otherBelief, narrative] of supportingBeliefs) {
+							list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + ".</font>"+narrative+"</li>";
 						}
 						document.getElementById("ResearchButton").appendChild(list);
 					}
 					if (opposingBeliefs.length > 0) {
 						document.getElementById("ResearchButton").innerHTML += "<h3>...currently opposing this one:</h3>";
 						let list = document.createElement("ul");
-						for (let [mutualSupport, otherBelief] of opposingBeliefs) {
-							list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + "</font></li>";
+						for (let [mutualSupport, otherBelief, narrative] of opposingBeliefs) {
+							list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + ".</font>"+narrative+"</li>";
 						}
 						document.getElementById("ResearchButton").appendChild(list);
 					}
 					if (neutralBeliefs.length > 0) {
 						document.getElementById("ResearchButton").innerHTML += "<h3>...that could affect this one, but currently don't:</h3>";
 						let list = document.createElement("ul");
-						for (let [mutualSupport, otherBelief] of neutralBeliefs) {
-							list.innerHTML += "<li>" + otherBelief + "</li>";
+						for (let [mutualSupport, otherBelief, narrative] of neutralBeliefs) {
+							list.innerHTML += "<li>" + otherBelief + ".</li>";
+							assert(narrative=="");
 						}
 						document.getElementById("ResearchButton").appendChild(list);
 					}
