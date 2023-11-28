@@ -1,4 +1,4 @@
-const PERMITTEDMINLOGPROB = -5.225   ; //for restricting moves; derived from game analysis
+const PERMITTEDMINLOGPROB = -6.1   ; //for restricting moves; derived from game analysis
 const CHARACTERNAME = "Bruto";
 async function load_elements(debug=false)
 {
@@ -61,7 +61,7 @@ Donald Trump's primary struggle is that he is Donald Trump
 01 Conventional members of society don't believe such nonsense.
 00 Conventional members of society don't believe such nonsense.
 
-GOVERNMENTS 0.2: Governments
+GOVERNMENTS 0.1: Governments
 Governments are the tools of a secret evil world order
 Governments are no more competent or moral than the rest of us
 Governments can be trusted
@@ -70,12 +70,12 @@ Governments can be trusted
 10 Hang on, maybe the government is secretly suppressing me?
 00 No evidence for government conspiracy there.
 01 No evidence for government conspiracy there.
-+5 PHARMA 01
++10 PHARMA 01
 11 And it's likely the government is involved too.
 10 Hang on, surely the government would be involved in this?
 00 No evidence for government conspiracy there.
 01 No evidence for government conspiracy there.
-+10 EXPERTSEVIL
++5 EXPERTSEVIL
 11 And many of then are openly in the pay of the government.
 01 Never explain with conspiracy what can be explained by incompetence.
 10 Hang on, lots of those experts are paid by the government. Follow the dots...
@@ -130,10 +130,10 @@ Disease is caused by germs, viruses, etc
 01 And lots of telecoms experts are very clear about 5G masts just being for phone signals.
 00 And lots of telecoms experts are very clear about 5G masts just being for phone signals.
 
-CHEMTRAILS 0.1: Chemtrails
+CHEMTRAILS 0.0001: Chemtrails
 Trails left behind jets are chemtrails used for mind control
 Trails left behind jets are condensed water called contrails
-+5 PHARMA 01
++10 PHARMA 01
 11 And they're obviously in on the manufacturing.
 10 Hang on, wouldn't they want to distribute mind control drugs by air?
 +5 GOVERNMENTS
@@ -157,11 +157,11 @@ Trails left behind jets are condensed water called contrails
 01 And lots of them are very clear about contrails being caused by vortices. Or something.
 00 And lots of them are very clear about contrails being caused by vortices. Or something.
 
-PHARMA 0.5: Big Pharma
+PHARMA 0.1: Big Pharma
 Big pharma is the tool of a secret world order
 Big pharma does not always act in the interests of the patient 
 Large medical research corporations are trustworthy
-+5 HOMEOPATHY 01
++10 HOMEOPATHY 01
 11 Of course they would try to suppress it.
 10 Hang on, big pharma deny that don't they.
 +5 EXPERTSEVIL 01
@@ -239,7 +239,7 @@ I'm secure in my friendships as a conventional member of society
 01 My friends would agree. 
 00 My friends would agree. We all paid attention in school.
 
-NORESPECT 0.5: Respect
+NORESPECT 0.7: Respect
 When we disagree on politics, my friends treat me with disdain and disgust because of my opinions
 My friends respect our differences and always assume the best of me, even when they can't understand why I think the way I do
 
