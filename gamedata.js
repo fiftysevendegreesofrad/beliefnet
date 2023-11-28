@@ -1,4 +1,4 @@
-const PERMITTEDMINLOGPROB = -5.09   ; //for restricting moves; derived from game analysis
+const PERMITTEDMINLOGPROB = -5.225   ; //for restricting moves; derived from game analysis
 const CHARACTERNAME = "Bruto";
 async function load_elements(debug=false)
 {
@@ -208,7 +208,7 @@ I am useless. There is no hope for me &#128577;
 OUTSIDER 0.1: Outsider
 My friends don't accept me; I need to find new friends who think like me
 I'm secure in my friendships as a conventional member of society
-+5 NORESPECT
++10 NORESPECT
 11 Actually they're not my friends any more.
 10 Come to think of it, why am I friends with these people?
 01 The world has room for me to be a little bit different.
