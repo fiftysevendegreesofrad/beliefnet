@@ -20,6 +20,8 @@ function getSupportingEdgesCoeffs(node)
     let supportingEdgesCoeffs = [];
     for (e of node.incomers("edge")) {
         let support = nodeCoeffValue(node) * nodeCoeffValue(e.source()) * e.data("weight");
+        if (e.data().positiveOnly && nodeCoeffValue(e.source()) < 0)
+            support = 0;
         supportingEdgesCoeffs.push([e, support]);
     }
     return supportingEdgesCoeffs;
@@ -74,6 +76,13 @@ function altNetworkLogLik(cy, nodesToChange) {
         cyClone.getElementById(nodeID).data("predicateValue", nodePredValue);
     return updateLogLik(cyClone);
 }
+function getNarrative(e,otherPredicate, predicateValue)
+{
+    const narrativeKey = otherPredicate+""+predicateValue;
+    let narrative = e.data("narrative")[narrativeKey];
+	if (narrative == undefined) narrative = "";
+    return narrative;
+}
 module.exports = {
     assert,
     predicateToIndex,
@@ -84,5 +93,6 @@ module.exports = {
     updateEdgeColoursGetNodeLogProb,
     altNetworkLogLik,
     updateLogLik,
-    computeBelievabilityFromLogLik
+    computeBelievabilityFromLogLik,
+    getNarrative
 };

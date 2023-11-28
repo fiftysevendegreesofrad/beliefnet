@@ -24,7 +24,8 @@ function getPredicateArrayLogProb(beliefNetGraph,predicateArray) {
         const sourcePredicate = predicateArray[sourceIndex];
         const targetPredicate = predicateArray[targetIndex];
         const support = sourcePredicate * targetPredicate * weight;
-        nodeLogOdds[targetIndex] += support;
+        if (!e.data.positiveOnly || sourcePredicate > 0)
+            nodeLogOdds[targetIndex] += support; //if we merge this with runtime logic we need to return 0 to show neutral belief
     }
     const logProbs = nodeLogOdds.map(x => x - Math.log(1 + Math.exp(x)));
     const logProb = logProbs.reduce((a,b) => a+b);
