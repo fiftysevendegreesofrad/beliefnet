@@ -293,8 +293,7 @@
 						document.getElementById("ResearchButton").innerHTML += "<h3>...that could affect this one, but currently don't:</h3>";
 						let list = document.createElement("ul");
 						for (let [mutualSupport, otherBelief, narrative] of neutralBeliefs) {
-							list.innerHTML += "<li>" + otherBelief + ".</li>";
-							assert(narrative=="");
+							list.innerHTML += `<li>${otherBelief}. ${narrative}</li>`;
 						}
 						document.getElementById("ResearchButton").appendChild(list);
 					}
