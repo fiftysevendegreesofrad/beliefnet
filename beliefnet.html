@@ -30,6 +30,33 @@
 		const ALLOWIMPOSSIBLEMOVES = false;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
+		//get clown images clown1.jpg through to clown7.jpg in an array
+		const NUMCLOWNIMAGES = 7;
+		let clownImages = [];
+		for (let i = 1; i <= NUMCLOWNIMAGES; i++)
+		{
+			let img = new Image();
+			img.src = "img/clown" + i + ".jpg";
+			clownImages.push(img);
+		}
+
+		function updateClownImage(cy)
+		{
+			//print all predicate values to console
+			let predicates = cy.nodes().map(x => x.data().predicateValue);
+			let totalPredicateValue = cy.nodes().map(x => x.data().predicateValue).reduce((a, b) => a + b);
+			let proportionComplete = totalPredicateValue/cy.nodes().size();
+			//madness is proportionComplete scaled such that MADNESS_THRESHOLD becomes 0 but 1 is still 1
+			const MADNESS_THRESHOLD = 0.1;
+			let madness = Math.max(0,proportionComplete-MADNESS_THRESHOLD)/(1-MADNESS_THRESHOLD);
+			let clownImageIndex = Math.floor(madness*(NUMCLOWNIMAGES-1));
+			let img = clownImages[clownImageIndex];
+			let madpercent = Math.floor(madness*100);
+			img.alt = `Picture of ${CHARACTERNAME} looking ${madpercent}% mad`;
+			document.getElementById("clown-image-container").innerHTML = "";
+			document.getElementById("clown-image-container").appendChild(img);
+		}
+
 		let narrative = [];
 		function updateProgressBar(percentage) {
 			let progressBar = document.getElementById("progress-bar");
@@ -195,6 +222,7 @@
 				return predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
 			}
 			function displayNodeDetails(node) {
+				updateClownImage(cy);
 				var leftPanel = document.getElementsByClassName("left-panel")[0];
 				leftPanel.classList.add("show");
 				document.getElementById("topic").innerHTML = node.data("displaylabel");
@@ -288,7 +316,10 @@
 						htmlOption+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=darkbg><font class=target color=ffff00><b>&nbsp;&darr; GAME TARGET &darr;&nbsp;</b></font></span><br><font class=target>";
 					htmlOption +=  "<font color="+color+">"+options[i]+"</font>";
 					if (isTargetOption)
-						htmlOption+='</font><br><i>(Your aim is to convince '+CHARACTERNAME+' of this)</i>';
+						htmlOption+=`</font><br><span class=darkbg><font class=target color=ffff00><b>
+							&nbsp;&uarr; Your aim is to convince ${CHARACTERNAME} of this &uarr;&nbsp;
+					</b></font></span>
+					`;
 					optionSpan.innerHTML = htmlOption;
 
 					let button = document.createElement("button");
@@ -338,7 +369,7 @@
 								else
 								{
 									message += `<li>Maybe influencing some other beliefs first will help.</li>`;
-									message += `<li>If not, maybe something else you've done is driving ${CHARACTERNAME}'s bullshitometer too high to trust you.
+									message += `<li>Even if the other beliefs all support what you're trying to do, it could be that the belief you're trying to influence is still unlikely. Something else you've done is driving ${CHARACTERNAME}'s bullshitometer too high to trust you, so you need to lower it first.
 										<br>
 											Look at the mind map for clues:
 											<ul>
@@ -386,7 +417,11 @@
 
 	<!-- Panels -->
 	<div class="row">
-		<div class="col-sm-3 left-panel">
+		<div class="col-sm-4 left-panel">
+			<div class="image-text-container">
+				<div class="bordered-image" id="clown-image-container"></div>
+				<p class="image-text">Psyops target<br>Name: <span class="CharacterName"></span><br>Age: 30</p>
+			</div>
 			<h1 id="topic"></h1>
 			<p id="currentBelief"></p>
 			<h2>Alternative Beliefs:</h2>
@@ -394,7 +429,7 @@
 
 			<div id="ResearchButton"></div>
 		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-8">
 			<div id="cy"></div>
 		</div>
 		<div class="col-sm-3 right-panel">
