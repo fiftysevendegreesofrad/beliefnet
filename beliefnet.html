@@ -26,8 +26,8 @@
 	<link rel="stylesheet" href="style.css">
 
 	<script>
-		const DEVMODE = true;
-		const ALLOWIMPOSSIBLEMOVES = true;
+		const DEVMODE = false;
+		const ALLOWIMPOSSIBLEMOVES = false;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		let narrative = [];
@@ -329,7 +329,26 @@
 						}
 						else {
 							button.addEventListener("click", function (evt1) {
-								showModal("You can't make this move (fixme give hints).");
+								let message = `<h2>You can't convince ${CHARACTERNAME} of this. 
+								           		His bullshitometer would climb above 100%.</h2>
+										   		<h3>Hints</h3><ul>`;
+								//if node is not researched, suggest researching it
+								if (node.data("researched")==0)
+									message += `<li>Try researching ${CHARACTERNAME}'s influencing beliefs first</li>`;
+								else
+								{
+									message += `<li>Maybe influencing some other beliefs first will help.</li>`;
+									message += `<li>If not, maybe something else you've done is driving ${CHARACTERNAME}'s bullshitometer too high to trust you.
+										<br>
+											Look at the mind map for clues:
+											<ul>
+												<li>Are any beliefs drawn larger? This means they are triggering the bullshitometer more.</li>
+												<li>Are any links between beliefs drawn in red? This means they are currently contradicting each other.</li>
+												<li>Are any links between beliefs drawn in grey? This means they aren't influencing each other at all right now, but they potentially could.</li>
+											</ul>	
+										</li>`;
+								}
+								showModal(message);
 							});
 						}
 					}
