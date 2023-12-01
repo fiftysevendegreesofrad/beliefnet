@@ -2,7 +2,7 @@
 .header {
     height: 50px;
     background-color: #f1f1f1;
-    text-align: center;
+    text-align: left;
     line-height: 50px;
 }
 
@@ -116,10 +116,12 @@ button {
 #fixed-text {
     color: rgb(99, 53, 35);
     font-size: 1em;
-    padding: 0; /* remove padding */
-    text-align: left; /* align text to the left */
+    padding-left: 5;
+    padding-right: 5;
+    padding-top: 0;
+    padding-bottom: 0;
+    text-align: left; 
     line-height: 1em;
-    /* all caps */
     text-transform: uppercase;
 }
 
