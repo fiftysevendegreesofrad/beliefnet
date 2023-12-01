@@ -21,3 +21,14 @@ DEV NOTES
 Test 1
 Can't display outcome before clicking or people won't think about the text, it's just a logic puzzle.
 People get confused by why they can't select a belief that has full support.
+
+TODO
+
+diallow further change after game end
+add credits
+add music
+add FAQ
+show network when failed influence
+reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs
+better style of game target
+reconsider pie charts; better to show probability after influences?

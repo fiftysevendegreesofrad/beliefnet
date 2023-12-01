@@ -26,8 +26,8 @@
 	<link rel="stylesheet" href="style.css">
 
 	<script>
-		const DEVMODE = false;
-		const ALLOWIMPOSSIBLEMOVES = false;
+		const DEVMODE = true;
+		const ALLOWIMPOSSIBLEMOVES = true;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		//get clown images clown1.jpg through to clown7.jpg in an array
@@ -312,12 +312,10 @@
 					let htmlOption = "";
 					let color = predicateToTextColour(getPredicateFromIndex(node.data(), i));
 					if (isTargetOption)
-						htmlOption+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=darkbg><font class=target color=ffff00><b>&nbsp;&darr; GAME TARGET &darr;&nbsp;</b></font></span><br><font class=target>";
+						htmlOption+=`<div class=targetbox><span class=darkbg><font class=target color=ffff00><b>&darr; GAME TARGET: Your aim is to convince ${CHARACTERNAME} of this &darr;</b></font></span><div class=targettextcontainer><font class=target>`;
 					htmlOption +=  "<font color="+color+">"+options[i]+"</font>";
 					if (isTargetOption)
-						htmlOption+=`</font><br><span class=darkbg><font class=target color=ffff00><b>
-							&nbsp;&uarr; Your aim is to convince ${CHARACTERNAME} of this &uarr;&nbsp;
-					</b></font></span>
+						htmlOption+=`</font></div></div>
 					`;
 					optionSpan.innerHTML = htmlOption;
 
@@ -372,7 +370,8 @@
 										<br>
 											Look at the mind map for clues:
 											<ul>
-												<li>Are any beliefs drawn larger? This means they are triggering the bullshitometer more.</li>
+												<li>Are any other beliefs influenced by this one? Maybe changing this belief would cause those to generate too much bullshit.</li>
+												<li>Are any beliefs drawn larger? This means they are currently triggering the bullshitometer more.</li>
 												<li>Are any links between beliefs drawn in red? This means they are currently contradicting each other.</li>
 												<li>Are any links between beliefs drawn in grey? This means they aren't influencing each other at all right now, but they potentially could.</li>
 											</ul>	
@@ -419,7 +418,16 @@
 		<div class="col-sm-4 left-panel">
 			<div class="image-text-container">
 				<div class="bordered-image" id="clown-image-container"></div>
-				<p class="image-text">Psyops target<br>Name: <span class="CharacterName"></span><br>Age: 30</p>
+				<p class="image-text"><b><u>PsyOps Target Subject</u></b>
+					<br>Name: <span class="CharacterName"></span>
+					<br>Age: 28
+					<br>Relationship status: Single
+					<br>Occupation: Telemarketer (Unemployed)
+					<br>Health status: Moderate
+					<br>
+					<br><b><u>PsyOps Target Belief</u></b>
+					<br>Reptilian Elite
+				</p>
 			</div>
 			<h1 id="topic"></h1>
 			<p id="currentBelief"></p>
