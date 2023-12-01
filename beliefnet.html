@@ -26,8 +26,8 @@
 	<link rel="stylesheet" href="style.css">
 
 	<script>
-		const DEVMODE = false;
-		const ALLOWIMPOSSIBLEMOVES = false;
+		const DEVMODE = true;
+		const ALLOWIMPOSSIBLEMOVES = true;
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		//get clown images clown1.jpg through to clown7.jpg in an array
@@ -372,7 +372,8 @@
 										<br>
 											Look at the mind map for clues:
 											<ul>
-												<li>Are any beliefs drawn larger? This means they are triggering the bullshitometer more.</li>
+												<li>Are any other beliefs influenced by this one? Maybe changing this belief would cause those to generate too much bullshit.</li>
+												<li>Are any beliefs drawn larger? This means they are currently triggering the bullshitometer more.</li>
 												<li>Are any links between beliefs drawn in red? This means they are currently contradicting each other.</li>
 												<li>Are any links between beliefs drawn in grey? This means they aren't influencing each other at all right now, but they potentially could.</li>
 											</ul>	
