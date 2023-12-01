@@ -17,6 +17,7 @@
 
 .image-text {
     margin-left: 10px; /* Optional: This will add some space between the image and the text */
+    font-family: monospace;
 }
 
 .left-panel {
