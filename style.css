@@ -162,7 +162,18 @@ button {
     font-weight: bold;
 }
 
+.targetbox {
+    border: 5px solid #444444;
+    padding: 0px;
+    margin: 0px;
+}
 .darkbg
 {
     background-color: #444444;
+    display: block;
+    width: 100%;
+    padding: 3px;
+}
+.targettextcontainer {
+    padding: 3px;
 }

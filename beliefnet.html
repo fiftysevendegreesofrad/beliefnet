@@ -312,12 +312,10 @@
 					let htmlOption = "";
 					let color = predicateToTextColour(getPredicateFromIndex(node.data(), i));
 					if (isTargetOption)
-						htmlOption+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class=darkbg><font class=target color=ffff00><b>&nbsp;&darr; GAME TARGET &darr;&nbsp;</b></font></span><br><font class=target>";
+						htmlOption+=`<div class=targetbox><span class=darkbg><font class=target color=ffff00><b>&darr; GAME TARGET: Your aim is to convince ${CHARACTERNAME} of this &darr;</b></font></span><div class=targettextcontainer><font class=target>`;
 					htmlOption +=  "<font color="+color+">"+options[i]+"</font>";
 					if (isTargetOption)
-						htmlOption+=`</font><br><span class=darkbg><font class=target color=ffff00><b>
-							&nbsp;&uarr; Your aim is to convince ${CHARACTERNAME} of this &uarr;&nbsp;
-					</b></font></span>
+						htmlOption+=`</font></div></div>
 					`;
 					optionSpan.innerHTML = htmlOption;
 
