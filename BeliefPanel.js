@@ -158,6 +158,7 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
 
     hideModal();
     hideNodeDetailsUpdateGraphDisplay(cy);
+    
     allowClickNodes = false;
     let prevPredValue = node.data("predicateValue");
     node.data("predicateValue", hypotheticalPredValue);
@@ -169,7 +170,9 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
         researchText = `<li>Not all beliefs have been researched, so some may be missing from this mind map</li>`;
 
     let cyPanel = document.getElementById("cy");
-    
+    cyPanel.style.background = "repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #fff0f0 10px, #fff0f0 20px)";
+
+
     impossibleInfo.classList.add("impossibleInfo");
     
     let p = document.createElement("p");
@@ -191,6 +194,7 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     impossibleInfo.appendChild(p);
 
     revertButton.addEventListener("click",()=>{
+        cyPanel.style.background = "";
         node.data("predicateValue", prevPredValue);
         updateBelievabilityDisplay(cy);
         updateGraphDisplay(cy);

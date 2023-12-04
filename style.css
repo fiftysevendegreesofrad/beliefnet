@@ -70,7 +70,8 @@ body {
 }
 
 #cy {
-    width: 100%;
+    width: 20cm;
+    max-width: 100%;
     margin: 0 auto;
     /* Add this line to center the graph horizontally */
     display: block;
