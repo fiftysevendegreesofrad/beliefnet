@@ -105,18 +105,14 @@ function displayNodeDetails(node) {
                     else
                     {
                         message += `<li>Maybe influencing some other beliefs first will help.</li>`;
-                        message += `<li>Even if the other beliefs all support what you're trying to do, it could be that the belief you're trying to influence is still unlikely. Something else you've done is driving ${CHARACTERNAME}'s bullshitometer too high to trust you, so you need to lower it first.
-                            <br>
-                                Look at the mind map for clues:
-                                <ul>
-                                    <li>Are any other beliefs influenced by this one? Maybe changing this belief would cause those to generate too much bullshit.</li>
-                                    <li>Are any beliefs drawn larger? This means they are currently triggering the bullshitometer more.</li>
-                                    <li>Are any links between beliefs drawn in red? This means they are currently contradicting each other.</li>
-                                    <li>Are any links between beliefs drawn in grey? This means they aren't influencing each other at all right now, but they potentially could.</li>
-                                </ul>	
+                        message += `<li>Even if the other beliefs all line up right, the belief you're trying to influence could still be too implausible for ${CHARACTERNAME}. 
+                        Can you lower the bullshitometer to grow his trust in you?
+                            <br><br>
+                                <button id="examine-hypothetical">Look at the mind map for clues</button>
                             </li>`;
                     }
                     showModal(message);
+                    document.getElementById("examine-hypothetical").addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue));
                 });
             }
         }
@@ -134,6 +130,40 @@ function displayNodeDetails(node) {
         table.appendChild(row);
     }
     document.getElementById("nodeDetails").appendChild(table);
+}
+
+function examineHypothetical(cy,node,hypotheticalPredValue) {
+    hideModal();
+    let prevPredValue = node.data("predicateValue");
+    node.data("predicateValue", hypotheticalPredValue);
+    updateBelievabilityDisplay(cy);
+    
+    let leftPanel = document.getElementsByClassName("left-panel")[0];
+    leftPanel.style.display = "none";
+    
+    let allResearched = cy.nodes().reduce((acc,curr)=>acc && curr.data("researched"),true);
+    let researchText = "";
+    if (!allResearched)
+        researchText = `<li>Not all beliefs have been researched, so some may be missing from this mind map</li>`;
+
+    let cyPanel = document.getElementById("cy");
+    let bottomText = document.createElement("div");
+    bottomText.classList.add("bottomText");
+    bottomText.innerHTML = `<p><b>Unachievable belief combination (bullshit > 100%)</b>
+    &nbsp;<button id="revert">Go back</button></p>
+    <ul>
+    <li>Beliefs shown <span class=larger>larger</span> are triggering the bullshitometer more</li>
+    <li>Links shown in <font color=red><b>red</b></font> show contradicting beliefs</li>
+    <li>Links shown in <b>grey</b> show beliefs which aren't influencing one another</li>
+    ${researchText}
+</ul>`
+    cyPanel.appendChild(bottomText);
+    document.getElementById("revert").addEventListener("click",()=>{
+        node.data("predicateValue", prevPredValue);
+        updateBelievabilityDisplay(cy);
+        leftPanel.style.display = "block";
+        bottomText.remove();
+    });   
 }
 
 function displayRelatedBeliefs(node) {
