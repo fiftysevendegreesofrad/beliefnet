@@ -38,6 +38,8 @@
 		}
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
+		let allowClickNodes = true;
+
 		//get clown images clown1.jpg through to clown7.jpg in an array
 		const NUMCLOWNIMAGES = 7;
 		let clownImages = [];
@@ -223,7 +225,8 @@
 
 			cy.bind('click', 'node', function (evt) {
 				let node = evt.target;
-				displayNodeDetails(node);
+				if (allowClickNodes)
+					displayNodeDetails(node);
 			});
 
 			

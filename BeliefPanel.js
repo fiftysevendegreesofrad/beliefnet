@@ -112,7 +112,7 @@ function displayNodeDetails(node) {
                             </li>`;
                     }
                     showModal(message);
-                    document.getElementById("examine-hypothetical").addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue));
+                    document.getElementById("examine-hypothetical").addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue)); //fixme may be race conditions
                 });
             }
         }
@@ -134,6 +134,7 @@ function displayNodeDetails(node) {
 
 function examineHypothetical(cy,node,hypotheticalPredValue) {
     hideModal();
+    allowClickNodes = false;
     let prevPredValue = node.data("predicateValue");
     node.data("predicateValue", hypotheticalPredValue);
     updateBelievabilityDisplay(cy);
@@ -163,6 +164,7 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
         updateBelievabilityDisplay(cy);
         leftPanel.style.display = "block";
         bottomText.remove();
+        allowClickNodes = true;
     });   
 }
 
