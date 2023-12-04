@@ -32,8 +32,8 @@ function displayNodeDetails(node) {
     document.getElementById("currentBelief").innerHTML = "<font color=" + color + "><b>"+CHARACTERNAME+" currently believes: " + options[whichSelected] + "</b></font>";
 
     //create research button
-    document.getElementById("ResearchButton").innerHTML = "";
     if (node.data("researched")==0) {
+        document.getElementById("ResearchButton").innerHTML = "";
         let button = document.createElement("button");
         button.innerHTML = "Research Related Beliefs";
         button.addEventListener("click", function (evt1) {
@@ -125,6 +125,11 @@ function displayNodeDetails(node) {
                         button.innerHTML = "Analyse failure to influence";
                         div.appendChild(button);
                         button.addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue)); 
+
+                        let button2 = document.createElement("button");
+                        button2.innerHTML = "Try something else";
+                        div.appendChild(button2);
+                        button2.addEventListener("click", hideModal);
                     }
 
                     showModal(div);
@@ -195,6 +200,20 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
 }
 
 function displayRelatedBeliefs(node) {
+    let researchButton = document.getElementById("ResearchButton");
+
+    researchButton.innerHTML = "";
+    
+    let closeButton = document.createElement("button");
+    closeButton.innerHTML = "View Mind Map";
+    closeButton.addEventListener("click", ()=>hideNodeDetailsUpdateGraphDisplay(cy));
+    closeButton.className = "align-right";
+    researchButton.appendChild(closeButton);
+
+    let researchHeader = document.createElement("h3");
+    researchHeader.innerHTML = CHARACTERNAME + "'s other beliefs...";
+    researchButton.appendChild(researchHeader);
+
     let predicateValue = node.data("predicateValue");
 
     let supportingBeliefs = [];
@@ -217,30 +236,27 @@ function displayRelatedBeliefs(node) {
             neutralBeliefs.push([nodeSupport, otherBelief, narrative]);
     }
     
-    document.getElementById("ResearchButton").innerHTML += "<h3>" + CHARACTERNAME + "'s other beliefs...</h3>";
+    let researchHTML = "";
     if (supportingBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...currently supporting this one:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...currently supporting this one:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of supportingBeliefs) {
-            list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
+            researchHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
     if (opposingBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...currently opposing this one:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...currently opposing this one:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of opposingBeliefs) {
-            list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
+            researchHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
     if (neutralBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...that could affect this one, but currently don't:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...that could affect this one, but currently don't:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of neutralBeliefs) {
-            list.innerHTML += `<li>${otherBelief}. ${narrative}</li>`;
+            researchHTML += `<li>${otherBelief}. ${narrative}</li>`;
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
 
     supportingBeliefs = [];
@@ -264,27 +280,28 @@ function displayRelatedBeliefs(node) {
     }
     
     if (supportingBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...currently supported by this one:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...currently supported by this one:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of supportingBeliefs) {
-            list.innerHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
+            researchHTML += "<li><font color=green>+" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
     if (opposingBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...currently opposed by this one:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...currently opposed by this one:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of opposingBeliefs) {
-            list.innerHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
+            researchHTML += "<li><font color=red>" + mutualSupport + ": " + otherBelief + ".</font>" + narrative + "</li>";
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
     if (neutralBeliefs.length > 0) {
-        document.getElementById("ResearchButton").innerHTML += "<h3>...that could be affected by this one, but currently aren't:</h3>";
-        let list = document.createElement("ul");
+        researchHTML += "<h3>...that could be affected by this one, but currently aren't:</h3><ul>";
         for (let [mutualSupport, otherBelief, narrative] of neutralBeliefs) {
-            list.innerHTML += `<li>${otherBelief}. ${narrative}</li>`;
+            researchHTML += `<li>${otherBelief}. ${narrative}</li>`;
         }
-        document.getElementById("ResearchButton").appendChild(list);
+        researchHTML += "</ul>";
     }
+
+    let div = document.createElement("div");
+    div.innerHTML = researchHTML;
+    researchButton.appendChild(div);
 }
