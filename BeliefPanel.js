@@ -1,24 +1,32 @@
 function animateNodeDetailsChange(node) {
-    let nodeDisplay = document.getElementById("node-display");
-    nodeDisplay.classList.remove("show");
-    setTimeout(function () { displayNodeDetails(node); }, 350);
+    hideNodeDisplay(()=>{updateGraphDisplay(cy);displayNodeDetails(node);});
 }
-function hideNodeDetailsUpdateGraphDisplay(cy) {
+function hideNodeDisplay(callback) {
     let nodeDisplay = document.getElementById("node-display");
     nodeDisplay.addEventListener('transitionend', function() {
-        updateGraphDisplay(cy);
+        callback();
+        nodeDisplay.style.display = "none";
+        document.body.style.overflow = "auto";
     },{once:true});
-    nodeDisplay.classList.remove("show");
+    document.body.style.overflow = "hidden";
+    nodeDisplay.classList.remove("on-screen");
+}
+function hideNodeDetailsUpdateGraphDisplay(cy) {
+    hideNodeDisplay(()=>updateGraphDisplay(cy));
 }
 function predicateToTextColour(predicateValue) {
     return predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
 }
-function displayNodeDetails(node) {
+function displayNodeDetails(node)
+{
+    updateNodeDetails(node);
+    let nodeDisplay = document.getElementById("node-display");
+    nodeDisplay.style.display = "block";
+    nodeDisplay.classList.add("on-screen");
+}
+function updateNodeDetails(node) {
     updateClownImage(cy);
     
-    let nodeDisplay = document.getElementById("node-display");
-    nodeDisplay.classList.add("show");
-
     let closeButton = document.getElementById("node-close");
     closeButton.onclick = function () {
         hideNodeDetailsUpdateGraphDisplay(cy);
@@ -99,7 +107,11 @@ function displayNodeDetails(node) {
                     updateBelievabilityDisplay(cy);
                     animateNodeDetailsChange(node);
                     if (isTargetOption)
-                        showModal("<h1>Well done!</h1><h2>Convinced that we are governed by reptiles, "+CHARACTERNAME+" goes out one day and stabs a zookeeper.</h2><h2>I hope you're proud of yourself.</h2>");
+                    {
+                        let div = document.createElement("div");
+                        div.innerHTML = `<h1>Well done!</h1><h2>Convinced that we are governed by reptiles, ${CHARACTERNAME} goes out one day and stabs a zookeeper.</h2><h2>I hope you're proud of yourself.</h2>`;
+                        showModal(div);
+                    }
                 });
             }
             else {
