@@ -1,15 +1,29 @@
-function refreshNodeDetails(node) {
-    var leftPanel = document.getElementsByClassName("left-panel")[0];
-    leftPanel.classList.remove("show");
+function animateNodeDetailsChange(node) {
+    let nodeDisplay = document.getElementById("node-display");
+    nodeDisplay.classList.remove("show");
     setTimeout(function () { displayNodeDetails(node); }, 350);
+}
+function hideNodeDetailsUpdateGraphDisplay(cy) {
+    let nodeDisplay = document.getElementById("node-display");
+    nodeDisplay.addEventListener('transitionend', function() {
+        updateGraphDisplay(cy);
+    },{once:true});
+    nodeDisplay.classList.remove("show");
 }
 function predicateToTextColour(predicateValue) {
     return predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
 }
 function displayNodeDetails(node) {
     updateClownImage(cy);
-    var leftPanel = document.getElementsByClassName("left-panel")[0];
-    leftPanel.classList.add("show");
+    
+    let nodeDisplay = document.getElementById("node-display");
+    nodeDisplay.classList.add("show");
+
+    let closeButton = document.getElementById("node-close");
+    closeButton.onclick = function () {
+        hideNodeDetailsUpdateGraphDisplay(cy);
+    }
+
     document.getElementById("topic").innerHTML = node.data("displaylabel");
     let options = node.data().options;
     let whichSelected = predicateToIndex(node);
@@ -29,8 +43,7 @@ function displayNodeDetails(node) {
                 e.source().style("display", "element");
             for (e of node.outgoers())
                 e.target().style("display", "element");
-            refreshNodeDetails(node);
-            updateGraphDisplay(cy);
+            hideNodeDetailsUpdateGraphDisplay(cy);
         });
         document.getElementById("ResearchButton").appendChild(button);
     }
@@ -39,7 +52,7 @@ function displayNodeDetails(node) {
     }
     //create buttons for other options
     document.getElementById("nodeDetails").innerHTML = "";
-    let prevNodeValues = cy.elements().map(x => x.json()); //for undo not yet implemented
+    //let prevNodeValues = cy.elements().map(x => x.json()); //for undo not yet implemented
     let table = document.createElement("table");
     for (let i = 0; i < options.length; i++) {
         let row = document.createElement("tr");
@@ -51,7 +64,7 @@ function displayNodeDetails(node) {
         let htmlOption = "";
         let color = predicateToTextColour(getPredicateFromIndex(node.data(), i));
         if (isTargetOption)
-            htmlOption+=`<div class=targetbox><span class=darkbg><font class=target color=ffff00><b>&darr; GAME TARGET: Your aim is to convince ${CHARACTERNAME} of this &darr;</b></font></span><div class=targettextcontainer><font class=target>`;
+            htmlOption+=`<div class=targetbox><span class=darkbg><font class=target color=ffff00><b>GAME TARGET<br>&darr; Your aim is to convince ${CHARACTERNAME} of this &darr;</b></font></span><div class=targettextcontainer><font class=target>`;
         htmlOption +=  "<font color="+color+">"+options[i]+"</font>";
         if (isTargetOption)
             htmlOption+=`</font></div></div>
@@ -83,36 +96,38 @@ function displayNodeDetails(node) {
 
                 button.addEventListener("click", function (evt1) {
                     node.data("predicateValue", buttonPredValue);
-                    narrative.push({
-                        message: options[i],
-                        logLik: resultingLogLik, prevLogLik: currentLogLik, undo: prevNodeValues
-                    });
                     updateBelievabilityDisplay(cy);
-                    updateNarrativeDisplay();
-                    refreshNodeDetails(node);
+                    animateNodeDetailsChange(node);
                     if (isTargetOption)
                         showModal("<h1>Well done!</h1><h2>Convinced that we are governed by reptiles, "+CHARACTERNAME+" goes out one day and stabs a zookeeper.</h2><h2>I hope you're proud of yourself.</h2>");
                 });
             }
             else {
                 button.addEventListener("click", function (evt1) {
+                    let div = document.createElement("div");
                     let message = `<h2>You can't convince ${CHARACTERNAME} of this. 
                                        His bullshitometer would climb above 100%.</h2>
-                                       <h3>Hints</h3><ul>`;
+                                       <ul>`;
                     //if node is not researched, suggest researching it
                     if (node.data("researched")==0)
-                        message += `<li>Try researching ${CHARACTERNAME}'s influencing beliefs first</li>`;
+                    {
+                        message += `<li>Try researching ${CHARACTERNAME}'s related beliefs first</li>`;
+                        div.innerHTML = message;
+                    }
                     else
                     {
                         message += `<li>Maybe influencing some other beliefs first will help.</li>`;
                         message += `<li>Even if the other beliefs all line up right, the belief you're trying to influence could still be too implausible for ${CHARACTERNAME}. 
                         Can you lower the bullshitometer to grow his trust in you?
-                            <br><br>
-                                <button id="examine-hypothetical">Look at the mind map for clues</button>
-                            </li>`;
+                        </li>`;
+                        div.innerHTML = message;
+                        let button = document.createElement("button");
+                        button.innerHTML = "Analyse failure to influence";
+                        div.appendChild(button);
+                        button.addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue)); 
                     }
-                    showModal(message);
-                    document.getElementById("examine-hypothetical").addEventListener("click", ()=>examineHypothetical(cy,node,buttonPredValue)); //fixme may be race conditions
+
+                    showModal(div);
                 });
             }
         }
@@ -134,13 +149,11 @@ function displayNodeDetails(node) {
 
 function examineHypothetical(cy,node,hypotheticalPredValue) {
     hideModal();
+    hideNodeDetailsUpdateGraphDisplay(cy);
     allowClickNodes = false;
     let prevPredValue = node.data("predicateValue");
     node.data("predicateValue", hypotheticalPredValue);
     updateBelievabilityDisplay(cy);
-    
-    let leftPanel = document.getElementsByClassName("left-panel")[0];
-    leftPanel.style.display = "none";
     
     let allResearched = cy.nodes().reduce((acc,curr)=>acc && curr.data("researched"),true);
     let researchText = "";
@@ -148,24 +161,34 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
         researchText = `<li>Not all beliefs have been researched, so some may be missing from this mind map</li>`;
 
     let cyPanel = document.getElementById("cy");
+    
     let bottomText = document.createElement("div");
     bottomText.classList.add("bottomText");
-    bottomText.innerHTML = `<p><b>Unachievable belief combination (bullshit > 100%)</b>
-    &nbsp;<button id="revert">Go back</button></p>
-    <ul>
+    
+    let p = document.createElement("p");
+    p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%)</b>&nbsp;`;
+    
+    let revertButton = document.createElement("button");
+    revertButton.innerHTML = "Go Back";
+    p.appendChild(revertButton);
+    
+    let ul = document.createElement("ul");
+    ul.innerHTML = `
     <li>Beliefs shown <span class=larger>larger</span> are triggering the bullshitometer more</li>
     <li>Links shown in <font color=red><b>red</b></font> show contradicting beliefs</li>
     <li>Links shown in <b>grey</b> show beliefs which aren't influencing one another</li>
-    ${researchText}
-</ul>`
+    ${researchText}`
+    p.appendChild(ul);
+
+    bottomText.appendChild(p);
     cyPanel.appendChild(bottomText);
-    document.getElementById("revert").addEventListener("click",()=>{
+    revertButton.addEventListener("click",()=>{
         node.data("predicateValue", prevPredValue);
         updateBelievabilityDisplay(cy);
-        leftPanel.style.display = "block";
+        updateGraphDisplay(cy);
         bottomText.remove();
         allowClickNodes = true;
-    });   
+    }); 
 }
 
 function displayRelatedBeliefs(node) {

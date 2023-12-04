@@ -54,8 +54,8 @@ clown images only change with actual wacky beliefs
 webpack? deployment with dependencies
 easy mode?
 affiliate links/sponsor?
+make new nodes appear just under last one
 
 refactors
 use `` more
-belief panel to new file
 combine logic with game solver

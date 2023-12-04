@@ -1,4 +1,7 @@
-/* Set height of the header */
+* {
+    font-size: 15px;
+}
+
 .header {
     height: 50px;
     background-color: #f1f1f1;
@@ -8,8 +11,12 @@
 
 .bordered-image {
     border: 2px solid black; 
+    max-width: 40%;
 }
 
+.clown-image{
+    max-width: 100%;
+}
 .image-text-container {
     display: flex;
     align-items: center; /* Optional: This will vertically center the text */
@@ -20,28 +27,30 @@
     font-family: monospace;
 }
 
-.left-panel {
+#node-display {
+    position: absolute;
+    left: 50%; 
+    top: 50px;
+    z-index: 1;
+    width: 20cm;
+    max-width: 100%;
     height: 100%;
     background-color: #aaa;
     padding: 30px;
-    transform: translateY(100%);
+    transform: translateX(-50%) translateY(100%);
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    
 }
 
-.left-panel.show {
+#node-display.show {
     opacity: 1;
-    transform: translateY(0%);
-}
-
-.right-panel {
-    height: 100%;
-    background-color: #bbb;
-    display: none;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* make modal-content narrow and centered on screen */
 .modal-content {
     width: 50%;
+    min-width: 300px;
     margin: 0 auto;
     position: absolute;
     top: 50%;
@@ -53,7 +62,6 @@
 
 body {
     font-family: helvetica;
-    font-size: 15px;
 }
 
 #cy {
@@ -65,7 +73,6 @@ body {
     /* Add this line to center the graph horizontally */
     align-items: center;
     /* Add this line to center the graph vertically */
-    z-index: 999;
     padding: 10%;
     box-sizing: border-box;
     /* Include padding in the total width and height */
@@ -91,7 +98,7 @@ h3 {
 }
 
 button {
-    font-size: 15px;
+    font-size: 1em;
     margin-right: 10px;
 }
 
@@ -126,10 +133,6 @@ button {
     text-transform: uppercase;
 }
 
-#moving-text {
-    color: white;
-}
-
 #progress-bar-container {
     display: inline-block;
     vertical-align: middle;
@@ -148,6 +151,7 @@ button {
 }
 
 #moving-text {
+    color: white;
     position: absolute;
     right: 5px;  
     white-space: nowrap;  
@@ -160,6 +164,8 @@ button {
     /* padding between rows */
     padding-bottom: 10px;
 }
+
+.table {font-size: 1em;}
 
 .target {
     font-weight: bold;
@@ -183,6 +189,22 @@ button {
 .bottomText {
     position: absolute;
     bottom: 20px;
-    left: 0;
-    right: 0;
+    left: 50%; 
+    z-index: 1;
+    width: 100%;
+    max-width: 20cm;
+    transform: translateX(-50%);
+    padding: 10px;
+}
+
+@media (max-width: 600px) {
+    #node-display {
+        padding: 10px;
+    }
+    * {
+        font-size: 10px;
+    }
+    #cy {
+        padding: 1%;
+    }
 }
