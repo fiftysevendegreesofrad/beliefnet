@@ -4,6 +4,9 @@
 
 .header {
     height: 50px;
+    width: 22cm;
+    margin: auto;
+    max-width: 100%;
     background-color: #f1f1f1;
     text-align: left;
     line-height: 50px;
