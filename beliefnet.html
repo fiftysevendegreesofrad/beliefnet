@@ -76,7 +76,10 @@
 			let logLik = updateLogLik(cy);
 			let believability = computeBelievabilityFromLogLik(logLik);
 			let bullshit = 100 - believability;
-			document.getElementById("moving-text").textContent = bullshit.toFixed(1) + "%";
+			let bullshitText = bullshit.toFixed(1) + "%";
+			if (bullshit > 100)
+				bullshitText = "OVERLOAD (" + bullshitText + ")";
+			document.getElementById("moving-text").textContent = bullshitText;
 			updateProgressBar(Math.min(bullshit,100));
 			if (DEVMODE)
 				document.getElementById("moving-text").textContent += " " + logLik.toFixed(2);
@@ -99,7 +102,9 @@
 					hideModal();
 				}
 			}
-			document.getElementsByClassName("modal-message")[0].appendChild(content);
+			let modalMessage = document.getElementById("modal-message");
+			modalMessage.innerHTML = "";
+			modalMessage.appendChild(content);
 		}
 		function stringListToTableRow(list) {
 			let row = document.createElement("tr");
@@ -251,10 +256,11 @@
 			<div id="ResearchButton"></div>
 		</div>
 		<div id="cy"></div>
+		<div id="bottom-text"></div>
 	</div>
 
 	<div id="myModal" class="modal">
-		<div class="modal-content"><span id='modal-close' class='close'>&times;</span><span class="modal-message"></span>
+		<div class="modal-content"><span id='modal-close' class='close'>&times;</span><span id="modal-message"></span>
 		</div>
 	</div>
 

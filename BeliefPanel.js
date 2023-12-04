@@ -148,6 +148,9 @@ function displayNodeDetails(node) {
 }
 
 function examineHypothetical(cy,node,hypotheticalPredValue) {
+    let bottomText = document.getElementById("bottom-text");
+    bottomText.innerHTML = "";
+
     hideModal();
     hideNodeDetailsUpdateGraphDisplay(cy);
     allowClickNodes = false;
@@ -162,7 +165,6 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
 
     let cyPanel = document.getElementById("cy");
     
-    let bottomText = document.createElement("div");
     bottomText.classList.add("bottomText");
     
     let p = document.createElement("p");
@@ -181,12 +183,12 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     p.appendChild(ul);
 
     bottomText.appendChild(p);
-    cyPanel.appendChild(bottomText);
+
     revertButton.addEventListener("click",()=>{
         node.data("predicateValue", prevPredValue);
         updateBelievabilityDisplay(cy);
         updateGraphDisplay(cy);
-        bottomText.remove();
+        bottomText.innerHTML = "";
         allowClickNodes = true;
     }); 
 }
