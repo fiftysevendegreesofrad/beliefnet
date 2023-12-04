@@ -148,8 +148,8 @@ function displayNodeDetails(node) {
 }
 
 function examineHypothetical(cy,node,hypotheticalPredValue) {
-    let bottomText = document.getElementById("bottom-text");
-    bottomText.innerHTML = "";
+    let impossibleInfo = document.getElementById("impossible-text");
+    impossibleInfo.innerHTML = "";
 
     hideModal();
     hideNodeDetailsUpdateGraphDisplay(cy);
@@ -165,13 +165,14 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
 
     let cyPanel = document.getElementById("cy");
     
-    bottomText.classList.add("bottomText");
+    impossibleInfo.classList.add("impossibleInfo");
     
     let p = document.createElement("p");
     p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%)</b>&nbsp;`;
     
     let revertButton = document.createElement("button");
     revertButton.innerHTML = "Go Back";
+    revertButton.className = "align-right";
     p.appendChild(revertButton);
     
     let ul = document.createElement("ul");
@@ -182,13 +183,13 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     ${researchText}`
     p.appendChild(ul);
 
-    bottomText.appendChild(p);
+    impossibleInfo.appendChild(p);
 
     revertButton.addEventListener("click",()=>{
         node.data("predicateValue", prevPredValue);
         updateBelievabilityDisplay(cy);
         updateGraphDisplay(cy);
-        bottomText.innerHTML = "";
+        impossibleInfo.innerHTML = "";
         allowClickNodes = true;
     }); 
 }

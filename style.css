@@ -191,9 +191,8 @@ button {
 .targettextcontainer {
     padding: 3px;
 }
-.bottomText {
+.impossibleInfo {
     position: absolute;
-    bottom: 20px;
     left: 50%; 
     z-index: 1;
     width: 100%;
@@ -217,4 +216,8 @@ button {
         height: 30px;
         line-height: 30px;
     }
+}
+
+.align-right {
+    float: right;
 }
