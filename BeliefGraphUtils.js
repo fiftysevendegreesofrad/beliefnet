@@ -15,6 +15,17 @@ function getPredicateFromIndex(node, index) {
 function nodeCoeffValue(node) {
     return (node.data("predicateValue") * 2 - 1);
 }
+function getSupportedEdgesCoeffs(node)
+{
+    let supportedEdgesCoeffs = [];
+    for (e of node.outgoers("edge")) {
+        let support = nodeCoeffValue(node) * nodeCoeffValue(e.target()) * e.data("weight");
+        if (e.data().positiveOnly && nodeCoeffValue(e.source()) < 0)
+            support = 0;
+        supportedEdgesCoeffs.push([e, support]);
+    }
+    return supportedEdgesCoeffs;
+}
 function getSupportingEdgesCoeffs(node)
 {
     let supportingEdgesCoeffs = [];
