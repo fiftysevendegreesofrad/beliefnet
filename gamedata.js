@@ -181,7 +181,7 @@ Homeopathy is indistinguishable from placebo, we're done here
 01 And they're pretty clear that homeopathic remedies are just sugar pills.
 00 And they're pretty clear that homeopathic remedies are just sugar pills.
 
-COMPETENT 0.5: I got fired 
+COMPETENT 0.5: I Got Fired 
 I got fired because the elite are trying to suppress me 
 I got fired because my manager was incompetent
 I got fired because I am incompetent 

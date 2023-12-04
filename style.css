@@ -1,15 +1,27 @@
-/* Set height of the header */
+* {
+    font-size: 15px;
+}
+
 .header {
     height: 50px;
+    width: 22cm;
+    margin: auto;
+    max-width: 100%;
     background-color: #f1f1f1;
     text-align: left;
     line-height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 .bordered-image {
     border: 2px solid black; 
+    max-width: 40%;
 }
 
+.clown-image{
+    max-width: 100%;
+}
 .image-text-container {
     display: flex;
     align-items: center; /* Optional: This will vertically center the text */
@@ -20,28 +32,28 @@
     font-family: monospace;
 }
 
-.left-panel {
+#node-display {
+    position: absolute;
+    left: 50%; 
+    top: 50px;
+    z-index: 1;
+    width: 20cm;
+    max-width: 100%;
     height: 100%;
     background-color: #aaa;
     padding: 30px;
-    transform: translateY(100%);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transform: translateX(-50%) translateY(100%);
+    transition: all 0.5s ease-in-out;
 }
 
-.left-panel.show {
-    opacity: 1;
-    transform: translateY(0%);
-}
-
-.right-panel {
-    height: 100%;
-    background-color: #bbb;
-    display: none;
+#node-display.on-screen {
+    transform: translateX(-50%) translateY(0);
 }
 
 /* make modal-content narrow and centered on screen */
 .modal-content {
     width: 50%;
+    min-width: 300px;
     margin: 0 auto;
     position: absolute;
     top: 50%;
@@ -53,12 +65,11 @@
 
 body {
     font-family: helvetica;
-    font-size: 15px;
 }
 
 #cy {
-    width: 100%;
-    height: 100%;
+    width: 20cm;
+    max-width: 100%;
     margin: 0 auto;
     /* Add this line to center the graph horizontally */
     display: block;
@@ -66,12 +77,13 @@ body {
     /* Add this line to center the graph horizontally */
     align-items: center;
     /* Add this line to center the graph vertically */
-    z-index: 999;
-    padding: 10%;
+    padding: 10px;
     box-sizing: border-box;
     /* Include padding in the total width and height */
     overflow: visible;
     /* Prevent content from overflowing outside the container */
+    position: relative;
+    height: calc(100vh - 50px); /* leave room for header */
 }
 
 h1 {
@@ -90,7 +102,7 @@ h3 {
 }
 
 button {
-    font-size: 15px;
+    font-size: 1em;
     margin-right: 10px;
 }
 
@@ -123,19 +135,15 @@ button {
     text-align: left; 
     line-height: 1em;
     text-transform: uppercase;
-}
-
-#moving-text {
-    color: white;
+    flex-shrink: 0;
 }
 
 #progress-bar-container {
     display: inline-block;
     vertical-align: middle;
-    width: 80%;
-    height: 40px;
     background-color: #f3f3f3;
     position: relative;  
+    flex-grow: 1;
 }
 
 #progress-bar {
@@ -147,6 +155,7 @@ button {
 }
 
 #moving-text {
+    color: white;
     position: absolute;
     right: 5px;  
     white-space: nowrap;  
@@ -159,6 +168,8 @@ button {
     /* padding between rows */
     padding-bottom: 10px;
 }
+
+.table {font-size: 1em;}
 
 .target {
     font-weight: bold;
@@ -178,4 +189,34 @@ button {
 }
 .targettextcontainer {
     padding: 3px;
+}
+.impossibleInfo {
+    position: absolute;
+    left: 50%; 
+    z-index: 1;
+    width: 100%;
+    max-width: 20cm;
+    transform: translateX(-50%);
+    padding: 10px;
+}
+
+@media (max-width: 600px) {
+    #node-display {
+        padding: 10px;
+        top: 30px;
+    }
+    * {
+        font-size: 10px;
+    }
+    #cy {
+        padding: 5px;
+    }
+    .header {
+        height: 30px;
+        line-height: 30px;
+    }
+}
+
+.align-right {
+    float: right;
 }

@@ -2,19 +2,37 @@ FAQ
 
 Do you really think that's how people fall for conspiracies? I don't.
 
-The primary aim of this project was to make a playable game that teaches something about critical thinking (so if you're asking that question, it might mean I'm succeeding already). It was not to make the most realistic model of human belief. In any case, everyone is different, but I did want to make something sort of plausible for one person.
+The aim of this project was to make a game that teaches something about critical thinking - so if you're asking that question, it may mean I'm succeeding already ;-). Some degree of realism is necessarily sacrificed in favour of simplicity and playability. 
 
-"Bold of you to assume there's any logic in conspiracy thinking", to summarize some feedback from friends. But actually I'll dispute that point. People who fall for conspiracies somehow manage to process incoming information and make sensible decisions all the time, for example, by not stepping out into fast moving traffic. Some of them even have very successful careers. I think the difference is that when a belief has no consequence (unlike, say, the beliefs we have about safe ways to cross the road), then they can get a bit bizarre and people have no incentive to correct them. People can even do weird stuff like believe they believe something, even though they don't really. But sometimes they do really believe things, strongly enough, for example, to storm the US Senate.
+Anyway, what do you mean by "people"? Everyone is different. There are about eight billion people alive in the world today; it's plausible that at least one of them has a cognitive model vaguely resembling Bruto's.
+
+"Bold of you to assume there's any logic in conspiracy thinking", to summarize some feedback from friends. But actually I'll dispute that point. People who fall for conspiracies somehow manage to process incoming information and make sensible decisions all the time, for example, by not stepping out into fast moving traffic. Some of them even have very successful careers. So some conspiracy victims are clearly capable of rational inference; it's just that their logic is a little bit broken.
 
 What is the logic model underlying the game, anyway?
 
-The likelihood of each belief is computed by logit regression - a very standard way of predicting probabilities, which is traditionally used to do things like figure out your insurance premium. The bullshitometer computes how unlikely all the current beliefs are in combination. It uses a log scale, not a linear one, as that seems to make better gameplay.
+The likelihood of each belief is computed by logit regression - a very standard way of predicting probabilities, which is traditionally used to do things like figure out your insurance premium. The bullshitometer computes how unlikely all the current beliefs are in combination. It uses a log scale, not a linear one, as that seems to give better gameplay.
+
+The maximum permissible amount of bullshit (least likely permissible combination of beliefs) is computed by a game solver that works out how to make the game <i>just about</i> solvable.
+
+Don't you realize some conspiracy theories turn out to be true?
+
+Yes. Yes they do. (link mkultra)
 
 You clearly believe/imply that XYZ is a crazy belief. I think you should reconsider; here are the reasons why you should believe XYZ.
 
 Firstly, don't assume I think all the non-mainstream beliefs in this game are crazy.
 
-Secondly, I don't care anyway; what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. 
+Secondly, what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. Actual beliefs are included for illustration only.
+
+I enjoyed that, have you made any other games / blogs / etc?
+
+Thanks! Yes, here.
+
+That is without doubt the worst Javascript I've ever seen running.
+
+Ah yes, but you <i>have</i> seen it running.
+
+Where can I contact you?
 
 DEV NOTES
 
@@ -26,9 +44,18 @@ TODO
 
 diallow further change after game end
 add credits
-add music
+add music (starting on first click)
 add FAQ
 show network when failed influence
 reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs
-better style of game target
-reconsider pie charts; better to show probability after influences?
+reconsider pie charts; better to show probability after influences? no, too easy
+mobile support
+clown images only change with actual wacky beliefs
+webpack? deployment with dependencies
+easy mode?
+affiliate links/sponsor?
+make new nodes appear just under last one
+
+refactors
+use `` more
+combine logic with game solver
