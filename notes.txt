@@ -24,6 +24,10 @@ Firstly, don't assume I think all the non-mainstream beliefs in this game are cr
 
 Secondly, what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. Actual beliefs are included for illustration only.
 
+How exactly would you define XYZ?
+
+I suspect you are about to argue in favour of XYZ, for your preferred definition. See above.
+
 I enjoyed that, have you made any other games / blogs / etc?
 
 Thanks! Yes, here.
@@ -56,6 +60,7 @@ webpack? deployment with dependencies
 easy mode?
 affiliate links/sponsor?
 make new nodes appear just under last one
+
 
 refactors
 use `` more
