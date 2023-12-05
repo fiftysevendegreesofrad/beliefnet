@@ -186,22 +186,30 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     cyPanel.style.background = "repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #fff0f0 10px, #fff0f0 20px)";
     
     let p = document.createElement("p");
-    p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%) for<br><i>${nodeText}</i></b>
-    <br><i>Click anywhere to go back</i>`;
+    p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%) for<br><i>${nodeText}</i></b>`;
        
     impossibleInfo.appendChild(p);
 
+    let button = document.createElement("button");
+    button.innerHTML = "Try something else";
+    button.classList.add("align-right");
+    impossibleInfo.appendChild(button);
+
+    function closeHypotheticalDisplay() {
+        cyPanel.style.background = "";
+        node.data("predicateValue", prevPredValue);
+        updateBelievabilityDisplay(cy);
+        updateGraphDisplay(cy);
+        impossibleInfo.innerHTML = "";
+        allowClickNodes = true;
+        normalGraphInfo.style.display = "block";
+    }
+
     setTimeout(()=>
-        document.addEventListener("click",()=>{
-            cyPanel.style.background = "";
-            node.data("predicateValue", prevPredValue);
-            updateBelievabilityDisplay(cy);
-            updateGraphDisplay(cy);
-            impossibleInfo.innerHTML = "";
-            allowClickNodes = true;
-            normalGraphInfo.style.display = "block";
-        },{once:true}, true) //useCapture=true to catch click before it reaches cy
+        document.addEventListener("click",closeHypotheticalDisplay,{once:true}, true) 
+        //useCapture=true to catch click before it reaches cy, but that still doesn't work on mobile so we make a button too
     ,100);
+    button.addEventListener("click",closeHypotheticalDisplay);
 }
 
 function displayRelatedBeliefs(node) {
