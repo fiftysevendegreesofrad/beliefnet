@@ -283,9 +283,7 @@ function displayRelatedBeliefs(node) {
         let otherBelief = n.data().displaylabel + ": " + n.data().options[predicateToIndex(n)];
         const otherPredicate = n.data().predicateValue;
 
-        let narrative = getNarrative(e, predicateValue, otherPredicate);
-        if (narrative != "")
-            narrative = " <i>" + narrative + "</i>";
+        let narrative = ""; //narratives are only written on target node
 
         if (nodeSupport > 0)
             supportingBeliefs.push([nodeSupport, otherBelief, narrative]);
