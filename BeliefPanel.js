@@ -200,7 +200,7 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
             impossibleInfo.innerHTML = "";
             allowClickNodes = true;
             normalGraphInfo.style.display = "block";
-        },{once:true})
+        },{once:true}, true) //useCapture=true to catch click before it reaches cy
     ,100);
 }
 
