@@ -73,17 +73,12 @@ body {
     width: 20cm;
     max-width: 100%;
     margin: 0 auto;
-    /* Add this line to center the graph horizontally */
     display: block;
     justify-content: center;
-    /* Add this line to center the graph horizontally */
     align-items: center;
-    /* Add this line to center the graph vertically */
     padding: 10px;
     box-sizing: border-box;
-    /* Include padding in the total width and height */
     overflow: visible;
-    /* Prevent content from overflowing outside the container */
     position: relative;
     height: calc(100vh - 50px); /* leave room for header */
 }

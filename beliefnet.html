@@ -134,6 +134,14 @@
 			let elements = await load_elements();
 			let maxweight = elements.edges.map(x => x.data.absweight).reduce((a, b) => Math.max(a, b));
 
+			let mediaQuery = window.matchMedia("(max-width: 600px)");
+			let cyFontSize;
+			function setCyFontSizeFromMedia(m)
+			{
+				cyFontSize = m.matches ? 19 : 12;
+			}
+			setCyFontSizeFromMedia(mediaQuery); //set once at start
+			
 			var cy = window.cy = cytoscape({
 				container: document.getElementById('cy'),
 
@@ -150,7 +158,8 @@
 							'pie-1-background-size': 'mapData(baseProb,0,1,0,100)',
 							'pie-2-background-color': 'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
 							'pie-2-background-size': 'mapData(baseProb,0,1,100,0)',
-							'display': nodeDisplay
+							'display': nodeDisplay,
+							'font-size': cyFontSize+"px"
 						}
 					},
 					{
