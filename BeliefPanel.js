@@ -165,8 +165,14 @@ function updateNodeDetails(node) {
 }
 
 function examineHypothetical(cy,node,hypotheticalPredValue) {
-    let impossibleInfo = document.getElementById("impossible-text");
+    let normalGraphInfo = document.getElementById("normal-graph-info");
+    normalGraphInfo.style.display = "none";
+    let impossibleInfo = document.getElementById("impossible-info");
     impossibleInfo.innerHTML = "";
+
+    let nodeName = node.data("displaylabel");
+    let option = predicateToOption(node, hypotheticalPredValue);
+    let nodeText = nodeName + ": " + option;
 
     hideModal();
     hideNodeDetailsUpdateGraphDisplay(cy);
@@ -176,43 +182,26 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     node.data("predicateValue", hypotheticalPredValue);
     updateBelievabilityDisplay(cy);
     
-    let allResearched = cy.nodes().reduce((acc,curr)=>acc && curr.data("researched"),true);
-    let researchText = "";
-    if (!allResearched)
-        researchText = `<li>Not all beliefs have been researched, so some may be missing from this mind map</li>`;
-
     let cyPanel = document.getElementById("cy");
     cyPanel.style.background = "repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #fff0f0 10px, #fff0f0 20px)";
-
-
-    impossibleInfo.classList.add("impossibleInfo");
     
     let p = document.createElement("p");
-    p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%)</b>&nbsp;`;
-    
-    let revertButton = document.createElement("button");
-    revertButton.innerHTML = "Go Back";
-    revertButton.className = "align-right";
-    p.appendChild(revertButton);
-    
-    let ul = document.createElement("ul");
-    ul.innerHTML = `
-    <li>Beliefs shown <span class=larger>larger</span> are triggering the bullshitometer more</li>
-    <li>Links shown in <font color=red><b>red</b></font> show contradicting beliefs</li>
-    <li>Links shown in <b>grey</b> show beliefs which aren't influencing one another</li>
-    ${researchText}`
-    p.appendChild(ul);
-
+    p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%) for<br><i>${nodeText}</i></b>
+    <br><i>Click anywhere to go back</i>`;
+       
     impossibleInfo.appendChild(p);
 
-    revertButton.addEventListener("click",()=>{
-        cyPanel.style.background = "";
-        node.data("predicateValue", prevPredValue);
-        updateBelievabilityDisplay(cy);
-        updateGraphDisplay(cy);
-        impossibleInfo.innerHTML = "";
-        allowClickNodes = true;
-    }); 
+    setTimeout(()=>
+        document.addEventListener("click",()=>{
+            cyPanel.style.background = "";
+            node.data("predicateValue", prevPredValue);
+            updateBelievabilityDisplay(cy);
+            updateGraphDisplay(cy);
+            impossibleInfo.innerHTML = "";
+            allowClickNodes = true;
+            normalGraphInfo.style.display = "block";
+        },{once:true})
+    ,100);
 }
 
 function displayRelatedBeliefs(node) {

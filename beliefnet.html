@@ -43,25 +43,23 @@
 		//get clown images clown1.jpg through to clown7.jpg in an array
 		const NUMCLOWNIMAGES = 7;
 		let clownImages = [];
-		for (let i = 1; i <= NUMCLOWNIMAGES; i++)
-		{
+		for (let i = 1; i <= NUMCLOWNIMAGES; i++) {
 			let img = new Image();
 			img.src = "img/clown" + i + ".jpg";
 			clownImages.push(img);
 		}
 
-		function updateClownImage(cy)
-		{
+		function updateClownImage(cy) {
 			//print all predicate values to console
 			let predicates = cy.nodes().map(x => x.data().predicateValue);
 			let totalPredicateValue = cy.nodes().map(x => x.data().predicateValue).reduce((a, b) => a + b);
-			let proportionComplete = totalPredicateValue/cy.nodes().size();
+			let proportionComplete = totalPredicateValue / cy.nodes().size();
 			//madness is proportionComplete scaled such that MADNESS_THRESHOLD becomes 0 but 1 is still 1
 			const MADNESS_THRESHOLD = 0.1;
-			let madness = Math.max(0,proportionComplete-MADNESS_THRESHOLD)/(1-MADNESS_THRESHOLD);
-			let clownImageIndex = Math.floor(madness*(NUMCLOWNIMAGES-1));
+			let madness = Math.max(0, proportionComplete - MADNESS_THRESHOLD) / (1 - MADNESS_THRESHOLD);
+			let clownImageIndex = Math.floor(madness * (NUMCLOWNIMAGES - 1));
 			let img = clownImages[clownImageIndex];
-			let madpercent = Math.floor(madness*100);
+			let madpercent = Math.floor(madness * 100);
 			img.alt = `Picture of ${CHARACTERNAME} looking ${madpercent}% mad`;
 			img.className = "clown-image";
 			document.getElementById("clown-image-container").innerHTML = "";
@@ -80,17 +78,16 @@
 			if (bullshit > 100)
 				bullshitText = "OVERLOAD (" + bullshitText + ")";
 			document.getElementById("moving-text").textContent = bullshitText;
-			updateProgressBar(Math.min(bullshit,100));
+			updateProgressBar(Math.min(bullshit, 100));
 			if (DEVMODE)
 				document.getElementById("moving-text").textContent += " " + logLik.toFixed(2);
 			cy.resize();
 		}
-		function hideModal()
-		{
+		function hideModal() {
 			let modal = document.getElementById("myModal");
 			modal.style.display = "none";
 		}
-		function showModal(content) {			
+		function showModal(content) {
 			let modal = document.getElementById("myModal");
 			let span = document.getElementById("modal-close");
 			modal.style.display = "block";
@@ -130,13 +127,21 @@
 			cy.layout(layoutOptions).run();
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
-			document.querySelectorAll('.CharacterName').forEach(function(element) {
+			document.querySelectorAll('.CharacterName').forEach(function (element) {
 				element.textContent = CHARACTERNAME;
 			});
 
 			let elements = await load_elements();
 			let maxweight = elements.edges.map(x => x.data.absweight).reduce((a, b) => Math.max(a, b));
 
+			let mediaQuery = window.matchMedia("(max-width: 600px)");
+			let cyFontSize;
+			function setCyFontSizeFromMedia(m)
+			{
+				cyFontSize = m.matches ? 19 : 12;
+			}
+			setCyFontSizeFromMedia(mediaQuery); //set once at start
+			
 			var cy = window.cy = cytoscape({
 				container: document.getElementById('cy'),
 
@@ -153,7 +158,8 @@
 							'pie-1-background-size': 'mapData(baseProb,0,1,0,100)',
 							'pie-2-background-color': 'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
 							'pie-2-background-size': 'mapData(baseProb,0,1,100,0)',
-							'display': nodeDisplay
+							'display': nodeDisplay,
+							'font-size': cyFontSize+"px"
 						}
 					},
 					{
@@ -214,7 +220,7 @@
 					displayNodeDetails(node);
 			});
 
-			
+
 
 
 
@@ -255,8 +261,25 @@
 
 			<div id="ResearchButton"></div>
 		</div>
-		<div id="impossible-text"></div>
+		<div id="normal-graph-info" class="graph-top">
+			<b>Mind map of <span class="CharacterName"></span>'s beliefs</b>
+			<br><i>Click any belief for details</i>
+		</div>
+		<div id="impossible-info" class="graph-top"></div>
 		<div id="cy"></div>
+		<div id="graph-bottom">
+			<ul>
+				<li>
+					<font color=red><b>Red links</b></font> show contradicting beliefs
+				</li>
+				<li>
+					<font color=green><b>Green links</b></font> show supporting beliefs
+				</li>
+				<li><b>Grey links</b> show beliefs which aren't influencing one another</li>
+				<li>Beliefs shown <span class=larger>larger</span> are triggering <span class="CharacterName"></span>'s
+					bullshitometer more</li>
+			</ul>
+		</div>
 	</div>
 
 	<div id="myModal" class="modal">
