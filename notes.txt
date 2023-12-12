@@ -60,7 +60,10 @@ webpack? deployment with dependencies
 easy mode?
 affiliate links/sponsor?
 make new nodes appear just under last one
-
+research button: don't show graph if no change. if there is change, animate it then return to panel
+bullshit scale minimum text
+dan screen size bug
+difficulty level
 
 refactors
 use `` more

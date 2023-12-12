@@ -45,7 +45,7 @@ The world is governed by humans
 00 Conventional members of society don't believe such nonsense.
 
 QANON 0.001: QAnon
-Donald Trump's primary struggle is to fight against Satan worshipping sex offenders
+Donald Trump's primary struggle is to fight against Satan worshipping cannibals
 Donald Trump's primary struggle is that he is Donald Trump
 +5 CHEMTRAILS 01
 11 If chemtrails are a thing, these guys are the number one suspects for being behind them.
