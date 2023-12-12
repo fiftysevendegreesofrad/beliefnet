@@ -1,8 +1,10 @@
 const {load_elements, } = require('./gamedata');
 const PriorityQueue = require('./priority-queue.min');
 
+let ENABLE_OUTPUT = true;
 async function output(text) {
-    process.stdout.write(""+text+"\n");
+    if (ENABLE_OUTPUT)
+        process.stdout.write(""+text+"\n");
 }
 async function progressReport(text) {
     process.stdout.write(text+"\r");
@@ -194,11 +196,55 @@ function addNodeIndicesToEdges(beliefNet) {
         e.data.targetIndex = beliefNet.nodes.indexOf(target);
     }
 }
+function countRandomWalks(startNode, isEndNode, predicateArrayOutgoingFunction, gameStateLogProbs, minLogProb, maxPathLength) {
+    let fastestPossibleRandomWalk = startNode.length;
+    //compute how many random walks hit the end node in fastestPossibleRandomWalk steps, fastestPossibleRandomWalk+1 steps, etc
+    let endNodeCountBySteps = [];
+    let endNodeCount = 0;
+    let iterations = 100000;
+    let maxWalkLength = maxPathLength;
+    for (let i = 0; i < maxWalkLength; i++)
+        endNodeCountBySteps.push(0);
+    for (let i = 0; i < iterations; i++) {
+        let currentNode = startNode;
+        let steps = 0;
+        while (steps < maxWalkLength) {
+            if (isEndNode(currentNode)) {
+                endNodeCountBySteps[steps]++;
+                endNodeCount++;
+                break;
+            }
+            let outgoing = predicateArrayOutgoingFunction(currentNode);
+            //filter out nodes with logprob < minLogProb
+            outgoing = outgoing.filter(x => gameStateLogProbs.get(x) >= minLogProb);
+            //filter out backtracing nodes
+            let currentWeird = currentNode.reduce((a,b) => a+b);
+            outgoing = outgoing.filter(x => x.reduce((a,b) => a+b) >= currentWeird);
+            if (outgoing.length == 0)
+                break;
+            let nextNode = outgoing[Math.floor(Math.random()*outgoing.length)];
+            currentNode = nextNode;
+            steps++;
+        }
+    }
+
+    //crop off first fastestPossibleRandomWalk items of endNodeCountBySteps
+    endNodeCountBySteps = endNodeCountBySteps.slice(fastestPossibleRandomWalk);
+    //divide by iterations
+    endNodeCountBySteps = endNodeCountBySteps.map(x => (x / iterations * 100));
+    let totalSuccesses = endNodeCountBySteps.reduce((a,b) => a+b);
+    endNodeCountBySteps = endNodeCountBySteps.map(x => x.toFixed(1));
+    output("Random walk minLogProb="+minLogProb+" "+endNodeCountBySteps+" total "+totalSuccesses.toPrecision(3)+"%");
+}
+
 async function main() {
     let beliefNet = await load_elements(debug=false);
 
     addNodeIndicesToEdges(beliefNet);
     let beliefNetOptionCounts = beliefNet.nodes.map(x => x.data.options.length);
+    let totalOptions = beliefNetOptionCounts.reduce((a,b) => a+b);
+    let maxPathLength = totalOptions-beliefNetOptionCounts.length;
+    output("Total options "+totalOptions+" max path length "+maxPathLength);
     let optionCountToPredicateValues = {2: [-1,1], 3:[-1,0,1]};
     let beliefNetPredicateValues = beliefNetOptionCounts.map(x => optionCountToPredicateValues[x]);
     
@@ -223,8 +269,19 @@ async function main() {
 
     let gameStateLogProbs = new GameStateLogProbCache(beliefNet);
     let unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
-    //gameStateLogProbs.prohibit(unlikliestState.node);
-    //unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
-
+    let alternativeRoutes = 30;
+    let logProbList = [gameStateLogProbs.get(unlikliestState.node)];
+    for (let i = 0; i < alternativeRoutes; i++) {
+        gameStateLogProbs.prohibit(unlikliestState.node);
+        ENABLE_OUTPUT = false;
+        unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
+        ENABLE_OUTPUT = true;
+        output("Alternative route "+(i+1)+" logprob "+gameStateLogProbs.get(unlikliestState.node));
+        logProbList.push(gameStateLogProbs.get(unlikliestState.node));
+    }
+    //reset gameStateLogProbs
+    gameStateLogProbs = new GameStateLogProbCache(beliefNet);
+    for (let lp of logProbList)
+        countRandomWalks(startNode, isEndNode, predicateArrayOutgoingFunction, gameStateLogProbs, lp, maxPathLength);
 }
 main();
