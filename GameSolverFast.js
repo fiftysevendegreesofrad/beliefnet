@@ -12,6 +12,15 @@ async function progressReport(text) {
 function probToLogOdds(prob) {
     return Math.log(prob / (1 - prob));
 }
+function logOddsToProb(logOdds) {
+    return Math.exp(logOdds) / (1 + Math.exp(logOdds));
+}
+function getBaseProbAdjustment(currentBase, supportChange) {
+    let currentLO = probToLogOdds(currentBase);
+    let desiredLO = currentLO - supportChange;
+    let desiredBaseProb = logOddsToProb(desiredLO);
+    return desiredBaseProb;
+}
 function stateToInteger(state) {
     const stateBase3 = state.map(x => x+1);
     return stateBase3.reduce((a,b) => a*3+b);
@@ -169,12 +178,12 @@ function findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgo
                 output(p);
             let finalState = searchState.node;
             if (!finalState.every(x => x === 1))
-                output ("WARNING: final state is not all 1s.");
+                process.stdout.write ("WARNING: final state is not all 1s.\n");
             for (let i = 0; i < finalState.length; i++)
                 if (finalState[i] != 1)
                 {
                     //get option from predicate                  
-                    output(predicateToOption(beliefNet.nodes[i],finalState[i]));
+                    process.stdout.write(predicateToOption(beliefNet.nodes[i],finalState[i])+"\n");
                 }
             return unlikliestState;
         }
@@ -228,8 +237,6 @@ function countRandomWalks(startNode, isEndNode, predicateArrayOutgoingFunction, 
         }
     }
 
-    //crop off first fastestPossibleRandomWalk items of endNodeCountBySteps
-    endNodeCountBySteps = endNodeCountBySteps.slice(fastestPossibleRandomWalk);
     //divide by iterations
     endNodeCountBySteps = endNodeCountBySteps.map(x => (x / iterations * 100));
     let totalSuccesses = endNodeCountBySteps.reduce((a,b) => a+b);
@@ -238,6 +245,28 @@ function countRandomWalks(startNode, isEndNode, predicateArrayOutgoingFunction, 
 }
 
 async function main() {
+
+    //write csv of logits
+    const fs = require('fs');
+    let csv = "";
+    let supportChanges = [1,2,3,5];
+    csv += "baseprob,";
+    for (let supportChange of supportChanges) {
+        csv += supportChange+",";
+    }
+    csv += "\n";
+    for (let baseprob of [0.5,0.1,0.01,0.001]) {
+        csv += baseprob+",";
+        for (let supportChange of supportChanges) {
+            csv += getBaseProbAdjustment(baseprob,supportChange)+",";
+        }
+        csv += "\n";
+    }
+    fs.writeFileSync("logits.csv",csv);
+
+    output(getBaseProbAdjustment(0.5,3));
+    //return;
+
     let beliefNet = await load_elements(debug=false);
 
     addNodeIndicesToEdges(beliefNet);
@@ -276,7 +305,7 @@ async function main() {
         ENABLE_OUTPUT = false;
         unlikliestState = findMaxLikelihoodPath(beliefNet, gameStateLogProbs, predicateArrayOutgoingFunction, startNode, isEndNode);
         ENABLE_OUTPUT = true;
-        output("Alternative route "+(i+1)+" logprob "+gameStateLogProbs.get(unlikliestState.node));
+        output("\nAlternative route "+(i+1)+" logprob "+gameStateLogProbs.get(unlikliestState.node));
         logProbList.push(gameStateLogProbs.get(unlikliestState.node));
     }
     //reset gameStateLogProbs

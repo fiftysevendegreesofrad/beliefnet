@@ -30,10 +30,11 @@
 		let DEVMODE;
 		let ALLOWIMPOSSIBLEMOVES;
 		if (window.location.protocol === 'file:') {
-			DEVMODE = false;
+			// TEST SETTINGS, CAN CHANGE
+			DEVMODE = true;
 			ALLOWIMPOSSIBLEMOVES = true;
 		} else {
-			DEVMODE = false; //DO NOT CHANGE
+			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
 			ALLOWIMPOSSIBLEMOVES = false; //DO NOT CHANGE
 		}
 		let nodeDisplay = DEVMODE ? "element" : "none";
