@@ -182,8 +182,10 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     node.data("predicateValue", hypotheticalPredValue);
     updateBelievabilityDisplay(cy);
     
-    let cyPanel = document.getElementById("cy");
-    cyPanel.style.background = "repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #fff0f0 10px, #fff0f0 20px)";
+    const gradient = "repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #fff0f0 10px, #fff0f0 20px)";
+    let bodydiv = document.getElementById("body-div");
+    bodydiv.style.background = gradient;
+    let restoreBackground = ()=>{bodydiv.style.background = "";};
     
     let p = document.createElement("p");
     p.innerHTML = `<b>Unachievable belief combination (bullshit > 100%) for<br><i>${nodeText}</i></b>`;
@@ -196,7 +198,7 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     impossibleInfo.appendChild(button);
 
     function closeHypotheticalDisplay() {
-        cyPanel.style.background = "";
+        restoreBackground();
         node.data("predicateValue", prevPredValue);
         updateBelievabilityDisplay(cy);
         updateGraphDisplay(cy);

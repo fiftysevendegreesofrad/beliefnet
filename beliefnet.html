@@ -32,7 +32,7 @@
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
 			DEVMODE = true;
-			ALLOWIMPOSSIBLEMOVES = true;
+			ALLOWIMPOSSIBLEMOVES = false;
 		} else {
 			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
 			ALLOWIMPOSSIBLEMOVES = false; //DO NOT CHANGE
@@ -114,6 +114,17 @@
 			}
 			return row;
 		}
+
+		//make cy square
+		window.addEventListener('resize', function() {
+			var cy = document.getElementById('cy');
+			console.log(cy.offsetWidth);
+			let maxCyHeight = window.innerHeight - 100;
+			let cySize = Math.min(cy.offsetWidth, maxCyHeight);
+			cy.style.height = cySize + 'px';
+			cy.style.width = cySize + 'px';
+		});
+
 		function updateGraphDisplay(cy) {
 			let visibleNodes = cy.nodes(":visible");
 			let layoutOptions = {
@@ -128,6 +139,8 @@
 			cy.layout(layoutOptions).run();
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
+			window.dispatchEvent(new Event('resize')); //trigger first time resize to make cy square
+
 			document.querySelectorAll('.CharacterName').forEach(function (element) {
 				element.textContent = CHARACTERNAME;
 			});
@@ -262,11 +275,14 @@
 
 			<div id="ResearchButton"></div>
 		</div>
-		<div id="normal-graph-info" class="graph-top">
-			<b>Mind map of <span class="CharacterName"></span>'s beliefs</b>
-			<br><i>Click any belief for details</i>
+		<div id="body-div">
+		<div class="graph-top">
+			<div id="normal-graph-info">
+				<b>Mind map of <span class="CharacterName"></span>'s beliefs</b>
+				<br><i>Click any belief for details</i>
+			</div>
 		</div>
-		<div id="impossible-info" class="graph-top"></div>
+		<div id="impossible-info"></div>
 		<div id="cy"></div>
 		<div id="graph-bottom">
 			<ul>
@@ -280,6 +296,7 @@
 				<li>Beliefs shown <span class=larger>larger</span> are triggering <span class="CharacterName"></span>'s
 					bullshitometer more</li>
 			</ul>
+		</div>
 		</div>
 	</div>
 
