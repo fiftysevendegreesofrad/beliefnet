@@ -157,7 +157,7 @@ Trails left behind jets are condensed water called contrails
 01 And lots of them are very clear about contrails being caused by vortices. Or something.
 00 And lots of them are very clear about contrails being caused by vortices. Or something.
 
-PHARMA 0.1: Big Pharma
+PHARMA 0.01: Big Pharma
 Big pharma is the tool of a secret world order
 Big pharma does not always act in the interests of the patient 
 Large medical research corporations are trustworthy
@@ -168,7 +168,7 @@ Large medical research corporations are trustworthy
 11 And the medical experts TELL us homeopathy DOESN'T work, because they don't want us to have that POWER.
 10 Could medical experts be TELLING us homeopathy doesn't work, because they don't want us to have that POWER?
 
-HOMEOPATHY 0.3: Homeopathy
+HOMEOPATHY 0.1: Homeopathy
 Homeopathy definitely works
 Science has proven nothing about homeopathy, but one day it might
 Homeopathy is indistinguishable from placebo, we're done here
@@ -243,7 +243,7 @@ NORESPECT 0.7: Respect
 When we disagree on politics, my friends treat me with disdain and disgust because of my opinions
 My friends respect our differences and always assume the best of me, even when they can't understand why I think the way I do
 
-EXPERTSWRONG 0.5: Expertise
+EXPERTSWRONG 0.04: Expertise
 Anyone who can make YouTube videos is an expert, and I can become one myself by watching them
 Experts are sometimes wrong, but if they have spent many years studying a topic, they have a better chance of being right than I do
 Experts should always be trusted
@@ -257,7 +257,7 @@ Experts should always be trusted
 00 And they always seem to follow mainstream expert opinion.
 11 Anyway they always just drag in some "expert" to suit their politics. What gives them the right to decide who is an expert?
 10 Anyway they always just drag in some "expert" to suit their politics. What gives them the right to decide who is an expert?
-+2 COMPETENT
++5 COMPETENT
 11 I'm good at my job, and I'm good at this too.
 10 I'm good at my job, and I could be good at this too.
 01 I'm bad at my job, maybe I wouldn't be so good at this either.
