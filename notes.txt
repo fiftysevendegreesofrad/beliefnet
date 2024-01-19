@@ -10,8 +10,7 @@ TODO
 
 diallow further change after game end
 add credits
-add music (starting on first click)
-add FAQ
+edit FAQ
 reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs
 reconsider pie charts; better to show probability after influences? no, too easy
 mobile support
@@ -19,13 +18,11 @@ clown images only change with actual wacky beliefs
 final dialog shows clown
 clown picture change animated?
 webpack? deployment with dependencies
-easy mode?
 affiliate links/sponsor?
 make new nodes appear just under last one
 research button: don't show graph if no change. if there is change, animate it then return to panel
 bullshit scale minimum text
 dan screen size bug
-difficulty level
 
 refactors
 use `` more

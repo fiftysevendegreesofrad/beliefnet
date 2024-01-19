@@ -287,6 +287,14 @@ button {
 .larger {
     font-size: 1.25em;
 }
+
+.paper-bg {
+    background-color: #f8f8f8; /* Light grey background to simulate paper */
+    background-image: 
+        linear-gradient(#ffeddb 11.34px, rgb(228, 228, 228) 11.34px); /* Horizontal lines to simulate rows */
+    background-size: 
+        100% 22.68px; /* Size of horizontal lines */
+}
 @media (max-width: 600px), (max-height: 600px) {
     #node-display {
         padding: 10px;

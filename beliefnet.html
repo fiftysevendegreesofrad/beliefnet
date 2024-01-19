@@ -32,7 +32,7 @@
 		let PERMITTEDMINLOGPROB = permittedMinLogProbs["Easy"];
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
-			DEVMODE = true;
+			DEVMODE = false;
 			ALLOWIMPOSSIBLEMOVES = false;
 		} else {
 			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
@@ -318,7 +318,7 @@
 	</div>
 
 	<div>
-		<div id="node-display">
+		<div id="node-display" class="paper-bg">
 			<span id='node-close' class='close'>&times;</span>
 			<div class="image-text-container">
 				<div class="bordered-image" id="clown-image-container"></div>
@@ -372,7 +372,7 @@
 
 	<div id="main-menu" class="modal behind">
 		<div class="menu-background">
-			<div class="menu-content">
+			<div class="menu-content paper-bg">
 				<p>
 				<span class="menu-title">BRUTO'S BULLSHITOMETER</span>
 				</p>
