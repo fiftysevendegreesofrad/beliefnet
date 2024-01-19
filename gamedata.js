@@ -1,4 +1,4 @@
-const PERMITTEDMINLOGPROB = -6.1   ; //for restricting moves; derived from game analysis
+const permittedMinLogProbs = {"easy":-8.37,"hard":-6.1}   ; //for restricting moves; derived from game analysis
 const CHARACTERNAME = "Bruto";
 async function load_elements(debug=false)
 {
@@ -341,4 +341,4 @@ Most experts are trying to get things right
     return elements;
 }
 
-module.exports = {load_elements, PERMITTEDMINLOGPROB};
+module.exports = {load_elements, permittedMinLogProbs};

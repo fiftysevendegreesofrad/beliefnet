@@ -14,6 +14,22 @@
     align-items: center;
 }
 
+.hamburger-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 2rem;
+    height: 2.5rem;
+    cursor: pointer;
+    margin: 2px;
+}
+
+.hamburger-menu div {
+    width: 2rem;
+    height: 0.4rem;
+    background: rgb(99, 53, 35);
+}
+
 .bordered-image {
     border: 2px solid black; 
     max-width: 40%;
@@ -62,8 +78,43 @@
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 20px;
+    z-index: 2000;
 }
 
+.behind {
+    z-index: 500;
+}
+
+.menu-background {
+    height: 100%;
+    width: 22cm;
+    margin: auto;
+    max-width: 100%;
+    background-color: #f1f1f1;
+    text-align: left;
+    align-items: center;
+    z-index: 10;
+}
+
+.menu-content {
+    width: 10cm;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 1700;
+    text-align: center;
+    border: 2px solid brown; 
+    border-radius: 15px; 
+}
+
+.radio {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
 
 body {
     font-family: helvetica;
@@ -132,6 +183,25 @@ button {
     line-height: 1em;
     text-transform: uppercase;
     flex-shrink: 0;
+}
+
+.menu-title {
+    color: rgb(99, 53, 35);
+    line-height: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 2em;
+}
+
+.btn-start {
+    background-color: brown;
+    border-color: brown;
+}
+
+.btn-about {
+    background-color: #f1f1f1;
+    border-color: brown;
+    color: brown;
 }
 
 #progress-bar-container {

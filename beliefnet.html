@@ -29,6 +29,7 @@
 	<script>
 		let DEVMODE;
 		let ALLOWIMPOSSIBLEMOVES;
+		let PERMITTEDMINLOGPROB = permittedMinLogProbs["Easy"];
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
 			DEVMODE = true;
@@ -103,6 +104,34 @@
 			let modalMessage = document.getElementById("modal-message");
 			modalMessage.innerHTML = "";
 			modalMessage.appendChild(content);
+		}
+		function showMainMenu() {
+			let menu = document.getElementById("main-menu");
+			menu.style.display = "block";
+		}
+		let audio = null;
+		function startOrResumeMusic() {
+			if (audio == null)
+			{
+				audio = new Audio("Oscillicraft - All The Thoughts.mp3");
+				audio.loop = true;
+			}
+			audio.play();
+		}
+		function stopMusic() {
+			if (audio != null) audio.pause();
+		}
+		function hideMainMenu() {
+			let menu = document.getElementById("main-menu");
+			menu.style.display = "none";
+			document.getElementById("start-button-text").textContent = "Resume";
+			let difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+			PERMITTEDMINLOGPROB = permittedMinLogProbs[difficulty];
+			console.log(difficulty + " PERMITTEDMINLOGPROB: " + PERMITTEDMINLOGPROB);
+			updateBelievabilityDisplay(window.cy);
+			//if music is not playing and sound is on, start playing music
+			let soundOn = document.querySelector('input[name="sound"]:checked').value == "on";
+			if (soundOn) startOrResumeMusic();
 		}
 		function stringListToTableRow(list) {
 			let row = document.createElement("tr");
@@ -226,7 +255,7 @@
 			updateGraphDisplay(cy);
 			updateLogLik(cy); //call to initialize node logprobs
 			updateBelievabilityDisplay(cy);
-			displayNodeDetails(firstNode);
+			showMainMenu();
 
 			cy.bind('tap', 'node', function (evt) {
 				let node = evt.target;
@@ -234,16 +263,52 @@
 					displayNodeDetails(node);
 			});
 
-
-
-
-
 		});
+
+		function verifyRestart()
+		{
+			//if game hasn't started just allow selection without further ado
+			let allZero = window.cy.nodes().every(function (node) {
+				return node.data().predicateValue == 0;
+			});
+			if (allZero) return;
+			
+			//otherwise ask for confirmation
+			let modalContent = document.createElement("div");
+			modalContent.innerHTML = "<p>Are you sure you want to restart? All beliefs will be reset.</p>";
+			let yesButton = document.createElement("button");
+			yesButton.className = "btn btn-primary";
+			yesButton.textContent = "Yes";
+			yesButton.onclick = function() {
+				//reset game state
+				window.cy.nodes().forEach(function (node) {
+					node.data().predicateValue = 0;
+				});
+				updateBelievabilityDisplay(window.cy);
+				hideModal();
+			}
+			let noButton = document.createElement("button");
+			noButton.className = "btn btn-primary";
+			noButton.textContent = "No";
+			noButton.onclick = function() {
+				//undo selection
+				document.querySelector('input[name="difficulty"][value="easy"]').checked = true;
+				hideModal();
+			}
+			modalContent.appendChild(yesButton);
+			modalContent.appendChild(noButton);
+			showModal(modalContent);
+		}
 	</script>
 </head>
 
 <body>
 	<div class="header">
+		<div class="hamburger-menu" onclick="showMainMenu()">
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
 		<span id="fixed-text"><span class="CharacterName"></span>'S<br>BULLSHITOMETER</span>
 		<div id="progress-bar-container">
 			<div id="progress-bar">
@@ -305,6 +370,30 @@
 		</div>
 	</div>
 
+	<div id="main-menu" class="modal behind">
+		<div class="menu-background">
+			<div class="menu-content">
+				<p>
+				<span class="menu-title">BRUTO'S BULLSHITOMETER</span>
+				</p>
+				<div class="radio">
+					<label><input type="radio" name="difficulty" value="easy" checked>Easy</label>
+					&nbsp;
+					<label><input type="radio" name="difficulty" value="hard" onclick="verifyRestart()">Hard</label>
+				</div>
+				<div class="radio">
+					<label><input type="radio" name="sound" value="on" onclick="startOrResumeMusic()" checked>Sound on</label>
+					&nbsp;
+					<label><input type="radio" name="sound" value="off" onclick="stopMusic()">Sound off</label>
+				</div>
+				<p>
+				<button type="button" class="btn btn-primary btn-about">About</button>
+				</p>
+				<p>
+				<button type="button" class="btn btn-primary btn-start" onclick="hideMainMenu()"><span id="start-button-text">Start</span></button>
+				</p>
+			</div>
+	</div>
 
 </body>
 
