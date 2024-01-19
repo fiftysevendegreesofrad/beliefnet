@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bruto's Bullshitometer</title>
+</head>
+<style>
+    .content {
+        /* max 22cm width and centre the div but not the text inside */
+        margin: 0 auto;
+        text-align: left;
+        max-width: 22cm;
+    }
+    
+</style>
+<body>
+    <div class="content">
+    <h1>Bruto's Bullshitometer</h1>
+    <h2>FAQ</h2>
+
+<h3>Do you really think that's how people fall for conspiracies? I don't.</h3>
+
+<p>The aim of this project was to make a game that teaches something about critical thinking - so if you're asking that question, it may mean I'm succeeding already ;-). Some degree of realism is necessarily sacrificed in favour of simplicity and playability. 
+
+<p>Anyway, what do you mean by "people"? Everyone is different. There are about eight billion people alive in the world today; it's plausible that at least one of them has a cognitive model vaguely resembling Bruto's.
+
+<p>"Bold of you to assume there's any logic in conspiracy thinking", to summarize some feedback from friends. But actually I'll dispute that point. People who fall for conspiracies somehow manage to process incoming information and make sensible decisions all the time, for example, by not stepping out into fast moving traffic. Some of them even have very successful careers. So some conspiracy victims are clearly capable of rational inference; it's just that their logic is a little bit broken.
+
+<h3>What is the logic model underlying the game, anyway?</h3>
+
+<p>The likelihood of each belief is computed by logit regression - a very standard way of predicting probabilities, which is traditionally used to do things like figure out your insurance premium. The bullshitometer computes how unlikely all the current beliefs are in combination. It uses a log scale, not a linear one, as that seems to give better gameplay.
+
+<p>The maximum permissible amount of bullshit (least likely permissible combination of beliefs) is computed by a game solver that works out how to make the game <i>just about</i> solvable.
+
+<h3>Don't you realize some conspiracy theories turn out to be true?</h3>
+
+<p>Yes. Yes they do. (link mkultra)
+
+<h3>You clearly believe/imply that XYZ is a crazy belief. I think you should reconsider; here are the reasons why you should believe XYZ.</h3>
+
+<p>Firstly, don't assume I think all the non-mainstream beliefs in this game are crazy.
+
+<p>Secondly, what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. Actual beliefs are included for illustration only.
+
+<h3>How exactly would you define XYZ?</h3>
+
+<p>I suspect you are about to argue in favour of XYZ, for your preferred definition. See above.
+
+<h3>I enjoyed that, have you made any other games / blogs / etc?</h3>
+
+<p>Thanks! Yes, here.
+
+<h3>That is without doubt the worst Javascript I've ever seen running.</h3>
+
+<p>Ah yes, but you <i>have</i> seen it running.
+
+<h3>Where can I contact you?</h3>
+
+<p>fixme
+</div>
+</body>
+</html>

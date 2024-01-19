@@ -1,42 +1,4 @@
-FAQ
 
-Do you really think that's how people fall for conspiracies? I don't.
-
-The aim of this project was to make a game that teaches something about critical thinking - so if you're asking that question, it may mean I'm succeeding already ;-). Some degree of realism is necessarily sacrificed in favour of simplicity and playability. 
-
-Anyway, what do you mean by "people"? Everyone is different. There are about eight billion people alive in the world today; it's plausible that at least one of them has a cognitive model vaguely resembling Bruto's.
-
-"Bold of you to assume there's any logic in conspiracy thinking", to summarize some feedback from friends. But actually I'll dispute that point. People who fall for conspiracies somehow manage to process incoming information and make sensible decisions all the time, for example, by not stepping out into fast moving traffic. Some of them even have very successful careers. So some conspiracy victims are clearly capable of rational inference; it's just that their logic is a little bit broken.
-
-What is the logic model underlying the game, anyway?
-
-The likelihood of each belief is computed by logit regression - a very standard way of predicting probabilities, which is traditionally used to do things like figure out your insurance premium. The bullshitometer computes how unlikely all the current beliefs are in combination. It uses a log scale, not a linear one, as that seems to give better gameplay.
-
-The maximum permissible amount of bullshit (least likely permissible combination of beliefs) is computed by a game solver that works out how to make the game <i>just about</i> solvable.
-
-Don't you realize some conspiracy theories turn out to be true?
-
-Yes. Yes they do. (link mkultra)
-
-You clearly believe/imply that XYZ is a crazy belief. I think you should reconsider; here are the reasons why you should believe XYZ.
-
-Firstly, don't assume I think all the non-mainstream beliefs in this game are crazy.
-
-Secondly, what I believe about XYZ isn't really relevant. I'm here to make you think about how people arrive at their beliefs, whatever they are. Actual beliefs are included for illustration only.
-
-How exactly would you define XYZ?
-
-I suspect you are about to argue in favour of XYZ, for your preferred definition. See above.
-
-I enjoyed that, have you made any other games / blogs / etc?
-
-Thanks! Yes, here.
-
-That is without doubt the worst Javascript I've ever seen running.
-
-Ah yes, but you <i>have</i> seen it running.
-
-Where can I contact you?
 
 DEV NOTES
 

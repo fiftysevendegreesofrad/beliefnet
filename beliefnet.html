@@ -109,17 +109,12 @@
 			let menu = document.getElementById("main-menu");
 			menu.style.display = "block";
 		}
-		let audio = null;
+		let audio = new Audio("Oscillicraft - All The Thoughts.mp3");
 		function startOrResumeMusic() {
-			if (audio == null)
-			{
-				audio = new Audio("Oscillicraft - All The Thoughts.mp3");
-				audio.loop = true;
-			}
 			audio.play();
 		}
 		function stopMusic() {
-			if (audio != null) audio.pause();
+			audio.pause();
 		}
 		function hideMainMenu() {
 			let menu = document.getElementById("main-menu");
@@ -299,6 +294,11 @@
 			modalContent.appendChild(noButton);
 			showModal(modalContent);
 		}
+
+		function about()
+		{
+			window.open('about.html', '_blank');
+		}
 	</script>
 </head>
 
@@ -387,7 +387,7 @@
 					<label><input type="radio" name="sound" value="off" onclick="stopMusic()">Sound off</label>
 				</div>
 				<p>
-				<button type="button" class="btn btn-primary btn-about">About</button>
+				<button type="button" class="btn btn-primary btn-about" onclick="about()">About</button>
 				</p>
 				<p>
 				<button type="button" class="btn btn-primary btn-start" onclick="hideMainMenu()"><span id="start-button-text">Start</span></button>
