@@ -16,7 +16,6 @@ reconsider pie charts; better to show probability after influences? no, too easy
 mobile support
 clown images only change with actual wacky beliefs
 final dialog shows clown
-clown picture change animated?
 webpack? deployment with dependencies
 affiliate links/sponsor?
 make new nodes appear just under last one
