@@ -304,6 +304,10 @@ button {
     * {
         font-size: 10px;
     }
+    .radio > label
+    {
+        font-size: 15px;
+    }
     #cy {
         padding: 0 5px;
     }
@@ -315,4 +319,9 @@ button {
 
 .align-right {
     float: right;
+}
+
+.hide-at-start
+{
+    display: none;
 }

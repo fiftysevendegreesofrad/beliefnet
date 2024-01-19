@@ -342,14 +342,14 @@
 		</div>
 		<div id="body-div">
 		<div class="graph-top">
-			<div id="normal-graph-info">
+			<div id="normal-graph-info" class="hide-at-start">
 				<b>Mind map of <span class="CharacterName"></span>'s beliefs</b>
 				<br><i>Click any belief for details</i>
 			</div>
 		</div>
 		<div id="impossible-info"></div>
 		<div id="cy"></div>
-		<div id="graph-bottom">
+		<div id="graph-bottom" class="hide-at-start">
 			<ul>
 				<li>
 					<font color=red><b>Red arrows</b></font> show contradicting beliefs
@@ -378,19 +378,19 @@
 				</p>
 				<div class="radio">
 					<label><input type="radio" name="difficulty" value="easy" checked>Easy</label>
-					&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;
 					<label><input type="radio" name="difficulty" value="hard" onclick="verifyRestart()">Hard</label>
 				</div>
 				<div class="radio">
 					<label><input type="radio" name="sound" value="on" onclick="startOrResumeMusic()" checked>Sound on</label>
-					&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;
 					<label><input type="radio" name="sound" value="off" onclick="stopMusic()">Sound off</label>
 				</div>
 				<p>
-				<button type="button" class="btn btn-primary btn-about" onclick="about()">About</button>
+				<button type="button" class="btn-about" onclick="about()">About</button>
 				</p>
 				<p>
-				<button type="button" class="btn btn-primary btn-start" onclick="hideMainMenu()"><span id="start-button-text">Start</span></button>
+				<button type="button" class="btn-start" onclick="hideMainMenu()"><span id="start-button-text">Start</span></button>
 				</p>
 			</div>
 	</div>

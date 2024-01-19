@@ -17,12 +17,18 @@ function hideNodeDetailsUpdateGraphDisplay(cy) {
 function predicateToTextColour(predicateValue) {
     return predicateValue == 0.5 ? "#111111" : (predicateValue > 0.5 ? "purple" : "blue");
 }
+function showHideAtStartClass() {
+    let elements = document.getElementsByClassName("hide-at-start");
+    for (let e of elements)
+        e.style.display = "block";
+}
 function displayNodeDetails(node)
 {
     updateNodeDetails(node);
     let nodeDisplay = document.getElementById("node-display");
     nodeDisplay.style.display = "block";
     nodeDisplay.classList.add("on-screen");
+    setTimeout(showHideAtStartClass, 1000);
 }
 function updateNodeDetails(node) {
     updateClownImage(cy);
