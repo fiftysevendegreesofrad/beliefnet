@@ -19,32 +19,16 @@ async function load_elements(debug=false)
     //blank line to end node
 
     let text=`
-REPTILES 0.00000000000001: Reptilian Elite
+REPTILES* 0.00000000000001: Reptilian Elite
 The world is governed by a secret elite of literal reptiles - actual lizard people
 The world is governed by humans
-+5 QANON 01
-11 If Bruto believes in QAnon, it's not too much of a stretch for him to believe the Satanic overlords are actually lizards as well
-10 Hang on, couldn't those Satanic overlords actually be lizard people?
-+10 GOVERNMENTS
++18.5 GOVERNMENTS
 11 ...which could even be run by lizards too.
 01 ...and they haven't said anything about lizard people.
 10 ...which could even be run by lizards too.
 00 ...and they haven't said anything about lizard people.
-+5 CHEMTRAILS
-11 Chemtrails could be a plot by the lizard people to stop us from seeing the truth.
-00 Without chemtrails for mind control, it would be hard for any lizard leaders to hide themselves.
-10 Hang on, chemtrails could be used by lizard people to stop us from seeing the truth.
-00 Without chemtrails for mind control, it would be hard for any lizard leaders to hide themselves.
-+5.5 BIRDS 01
-11 The drones could be used by lizard people to spy on us.
-10 Hang on, the drones could be used by lizard people to spy on us.
-+3 OUTSIDER
-11 Bruto is more likely to believe wacky shit if he identifies as an outsider.
-10 Bruto is more likely to believe wacky shit if he identifies as an outsider.
-01 Conventional members of society don't believe such nonsense.
-00 Conventional members of society don't believe such nonsense.
 
-QANON 0.001: QAnon
+QANON* 0.001: QAnon
 Donald Trump's primary struggle is to fight against Satan worshipping cannibals
 Donald Trump's primary struggle is that he is Donald Trump
 +5 CHEMTRAILS 01
@@ -61,7 +45,7 @@ Donald Trump's primary struggle is that he is Donald Trump
 01 Conventional members of society don't believe such nonsense.
 00 Conventional members of society don't believe such nonsense.
 
-GOVERNMENTS 0.1: Governments
+GOVERNMENTS* 0.1: Governments
 Governments are the tools of a secret evil world order
 Governments are no more competent or moral than the rest of us
 Governments can be trusted
@@ -81,7 +65,7 @@ Governments can be trusted
 10 Hang on, lots of those experts are paid by the government. Follow the dots...
 00 Never explain with conspiracy what can be explained by incompetence.
 
-BIRDS 0.000001: Birds
+BIRDS* 0.000001: Birds
 All birds have been replaced with robot surveillance drones
 Birds are just birds, man, they're cool but what's the big deal?
 +5 GOVERNMENTS 01
@@ -103,7 +87,7 @@ Birds are just birds, man, they're cool but what's the big deal?
 01 And lots of bird experts are very clear about them being animals, not robots.
 00 And lots of bird experts are very clear about them being animals, not robots.
 
-FIVEG 0.05: 5G
+FIVEG* 0.05: 5G
 Disease is caused by 5G phone masts
 Disease is caused by germs, viruses, etc
 +5 CHEMTRAILS 01
@@ -130,7 +114,7 @@ Disease is caused by germs, viruses, etc
 01 And lots of telecoms experts are very clear about 5G masts just being for phone signals.
 00 And lots of telecoms experts are very clear about 5G masts just being for phone signals.
 
-CHEMTRAILS 0.0001: Chemtrails
+CHEMTRAILS* 0.0001: Chemtrails
 Trails left behind jets are chemtrails used for mind control
 Trails left behind jets are condensed water called contrails
 +10 PHARMA 01
@@ -157,7 +141,7 @@ Trails left behind jets are condensed water called contrails
 01 And lots of them are very clear about contrails being caused by vortices. Or something.
 00 And lots of them are very clear about contrails being caused by vortices. Or something.
 
-PHARMA 0.01: Big Pharma
+PHARMA* 0.01: Big Pharma
 Big pharma is the tool of a secret world order
 Big pharma does not always act in the interests of the patient 
 Large medical research corporations are trustworthy
@@ -168,7 +152,7 @@ Large medical research corporations are trustworthy
 11 And the medical experts TELL us homeopathy DOESN'T work, because they don't want us to have that POWER.
 10 Could medical experts be TELLING us homeopathy doesn't work, because they don't want us to have that POWER?
 
-HOMEOPATHY 0.1: Homeopathy
+HOMEOPATHY* 0.1: Homeopathy
 Homeopathy definitely works
 Science has proven nothing about homeopathy, but one day it might
 Homeopathy is indistinguishable from placebo, we're done here
@@ -181,7 +165,7 @@ Homeopathy is indistinguishable from placebo, we're done here
 01 And they're pretty clear that homeopathic remedies are just sugar pills.
 00 And they're pretty clear that homeopathic remedies are just sugar pills.
 
-COMPETENT 0.5: I Got Fired 
+COMPETENT* 0.5: I Got Fired 
 I got fired because the elite are trying to suppress me 
 I got fired because my manager was incompetent
 I got fired because I am incompetent 
@@ -191,7 +175,7 @@ I got fired because I am incompetent
 01 Then again, I'm rubbish at this job anyway. There doesn't need to be any conspiracy to explain why I got fired.
 00 I'm rubbish at this job, and all of them for that matter.
 
-IBSCURE 0.5: IBS 
+IBSCURE* 0.5: IBS 
 My Irritable Bowel Syndrome can be cured
 ...well, maybe. I dunno
 My Irritable Bowel Syndrome is incurable
@@ -213,11 +197,6 @@ I'm secure in my friendships as a conventional member of society
 10 Come to think of it, why am I friends with these people?
 01 The world has room for me to be a little bit different.
 00 Not that we have any differences, really.
-+1 REPTILES
-11 My friends don't think that.
-10 My friends don't think that.
-01 My friends would agree.
-00 My friends would agree.
 +1 QANON
 11 My friends don't think that.
 10 My friends don't think that.
@@ -243,7 +222,7 @@ NORESPECT 0.7: Respect
 When we disagree on politics, my friends treat me with disdain and disgust because of my opinions
 My friends respect our differences and always assume the best of me, even when they can't understand why I think the way I do
 
-EXPERTSWRONG 0.04: Expertise
+EXPERTSWRONG* 0.04: Expertise
 Anyone who can make YouTube videos is an expert, and I can become one myself by watching them
 Experts are sometimes wrong, but if they have spent many years studying a topic, they have a better chance of being right than I do
 Experts should always be trusted
@@ -263,7 +242,7 @@ Experts should always be trusted
 01 I'm bad at my job, maybe I wouldn't be so good at this either.
 00 I'm bad at my job, no way I could be an expert in anything.
 
-EXPERTSEVIL 0.05: Expert Conspiracy
+EXPERTSEVIL* 0.05: Expert Conspiracy
 Experts are part of a conspiracy to suppress the truth
 Most experts are trying to get things right
 +3 PHARMA
@@ -301,6 +280,10 @@ Most experts are trying to get things right
         let baseProb = parseFloat(leftparts[1]);
         let userLabel = parts[1].trim();
 
+        let wacky = nodeLabel[nodeLabel.length-1]=="*";
+        if (wacky)
+            nodeLabel = nodeLabel.substring(0,nodeLabel.length-1);
+
         let options=[]
         line = lines.shift();
         while (true)
@@ -314,7 +297,7 @@ Most experts are trying to get things right
             line = lines.shift();
         }
         elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabel, baseProb: baseProb, options: options,
-            predicateValue: 0, logprob: 0, researched: 0, target: false}});
+            predicateValue: 0, logprob: 0, researched: 0, wacky: wacky, target: false}});
 
         //now we are expecting edges
         while(line.trim()!="")

@@ -8,21 +8,16 @@ People get confused by why they can't select a belief that has full support.
 
 TODO
 
-first 'explore' shouldn't reveal too much
+reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs; all change anyway now i isolated reptiles?
+add credits link to end
+only final dialog shows full clown
+
 diallow further change after game end
-add credits
-edit FAQ
-reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs
-reconsider pie charts; better to show probability after influences? no, too easy
-mobile support
-clown images only change with actual wacky beliefs
-final dialog shows clown
+finish FAQ
 webpack? deployment with dependencies
 affiliate links/sponsor?
 make new nodes appear just under last one
 research button: don't show graph if no change. if there is change, animate it then return to panel
-bullshit scale minimum text
-dan screen size bug
 
 refactors
 use `` more

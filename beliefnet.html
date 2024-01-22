@@ -52,14 +52,17 @@
 		}
 
 		function updateClownImage(cy) {
-			//print all predicate values to console
-			let predicates = cy.nodes().map(x => x.data().predicateValue);
-			let totalPredicateValue = cy.nodes().map(x => x.data().predicateValue).reduce((a, b) => a + b);
-			let proportionComplete = totalPredicateValue / cy.nodes().size();
-			//madness is proportionComplete scaled such that MADNESS_THRESHOLD becomes 0 but 1 is still 1
-			const MADNESS_THRESHOLD = 0.1;
-			let madness = Math.max(0, proportionComplete - MADNESS_THRESHOLD) / (1 - MADNESS_THRESHOLD);
+			let totalWackValue = cy.nodes().map(x => (x.data().predicateValue==1 && x.data().wacky)?1:0).reduce((a, b) => a + b);
+			let numWackyNodes = cy.nodes().filter(x => x.data().wacky).size();
+			console.log("totalWackValue: " + totalWackValue);
+			console.log("numWackyNodes: " + numWackyNodes);
+			let madness = totalWackValue / numWackyNodes;
+
+			//clown image index is 0 if and only if madness is 0, but otherwise scales linearly with madness
+			//clown image index is NUMCLOWNIMAGES-1 if and only if madness is 1
 			let clownImageIndex = Math.floor(madness * (NUMCLOWNIMAGES - 1));
+			if (madness>0 && clownImageIndex<1) clownImageIndex = 1;
+
 			let img = clownImages[clownImageIndex];
 			let madpercent = Math.floor(madness * 100);
 			img.alt = `Picture of ${CHARACTERNAME} looking ${madpercent}% mad`;
