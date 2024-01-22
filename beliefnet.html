@@ -32,7 +32,7 @@
 		let PERMITTEDMINLOGPROB = permittedMinLogProbs["Easy"];
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
-			DEVMODE = false;
+			DEVMODE = true;
 			ALLOWIMPOSSIBLEMOVES = false;
 		} else {
 			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
@@ -109,12 +109,12 @@
 			let menu = document.getElementById("main-menu");
 			menu.style.display = "block";
 		}
-		let audio = new Audio("Oscillicraft - All The Thoughts.mp3");
+		let audio = DEVMODE?null:new Audio("Oscillicraft - All The Thoughts.mp3");
 		function startOrResumeMusic() {
-			audio.play();
+			if (!DEVMODE) audio.play();
 		}
 		function stopMusic() {
-			audio.pause();
+			if (!DEVMODE) audio.pause();
 		}
 		function hideMainMenu() {
 			let menu = document.getElementById("main-menu");
@@ -234,7 +234,7 @@
 							'curve-style': 'unbundled-bezier',
 							'control-point-distances': '10px',
 							'control-point-weights': '0.5',
-							'label': 'data(weight)'
+							'label': DEVMODE?'data(weight)':''
 						}
 					}
 				],

@@ -8,6 +8,7 @@ People get confused by why they can't select a belief that has full support.
 
 TODO
 
+first 'explore' shouldn't reveal too much
 diallow further change after game end
 add credits
 edit FAQ
