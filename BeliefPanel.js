@@ -49,14 +49,15 @@ function updateNodeDetails(node) {
     if (node.data("researched")==0) {
         document.getElementById("ResearchButton").innerHTML = "";
         let button = document.createElement("button");
-        button.innerHTML = "Research Related Beliefs";
+        button.innerHTML = "Research Influencing Beliefs";
         button.addEventListener("click", function (evt1) {
             node.data("researched", 1);
             //iterate through neighbouring nodes
             for (e of node.incomers())
                 e.source().style("display", "element");
-            for (e of node.outgoers())
-                e.target().style("display", "element");
+            //no longer showing beliefs infleunced by this one, as it's more fun to discover them
+            //for (e of node.outgoers())
+            //    e.target().style("display", "element");
             hideNodeDetailsUpdateGraphDisplay(cy);
         });
         document.getElementById("ResearchButton").appendChild(button);
@@ -203,6 +204,14 @@ function examineHypothetical(cy,node,hypotheticalPredValue) {
     button.classList.add("align-right");
     impossibleInfo.appendChild(button);
 
+    //if any beliefs are not researched
+    let unresearched = cy.elements().filter(x => x.data("researched")==0);
+    if (unresearched.length > 0) {
+        let p = document.createElement("p");
+        p.innerHTML = `<i>Warning: there are also  some unresearched beliefs which may be triggering the bullshitometer</i>`;
+        impossibleInfo.appendChild(p);
+    }
+
     function closeHypotheticalDisplay() {
         restoreBackground();
         node.data("predicateValue", prevPredValue);
@@ -283,7 +292,9 @@ function displayRelatedBeliefs(node) {
     supportingBeliefs = [];
     opposingBeliefs = [];
     neutralBeliefs = [];
+
     for (let [e, nodeSupport] of getSupportedEdgesCoeffs(node)) {
+        if (e.target().data("researched")==0) continue;
         let n = e.target();
         let otherBelief = n.data().displaylabel + ": " + n.data().options[predicateToIndex(n)];
         const otherPredicate = n.data().predicateValue;
