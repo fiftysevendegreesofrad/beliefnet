@@ -33,7 +33,7 @@
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
 			DEVMODE = true;
-			ALLOWIMPOSSIBLEMOVES = false;
+			ALLOWIMPOSSIBLEMOVES = true;
 		} else {
 			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
 			ALLOWIMPOSSIBLEMOVES = false; //DO NOT CHANGE
@@ -51,11 +51,16 @@
 			clownImages.push(img);
 		}
 
+		function getClownImage(clownImageIndex=NUMCLOWNIMAGES-1, madness=1) {
+			let img = clownImages[clownImageIndex];
+			let madpercent = Math.floor(madness * 100);
+			img.alt = `Picture of ${CHARACTERNAME} looking ${madpercent}% mad`;
+			img.className = "clown-image";
+			return img;
+		}
 		function updateClownImage(cy) {
 			let totalWackValue = cy.nodes().map(x => (x.data().predicateValue==1 && x.data().wacky)?1:0).reduce((a, b) => a + b);
 			let numWackyNodes = cy.nodes().filter(x => x.data().wacky).size();
-			console.log("totalWackValue: " + totalWackValue);
-			console.log("numWackyNodes: " + numWackyNodes);
 			let madness = totalWackValue / numWackyNodes;
 
 			//clown image index is 0 if and only if madness is 0, but otherwise scales linearly with madness
@@ -63,10 +68,7 @@
 			let clownImageIndex = Math.floor(madness * (NUMCLOWNIMAGES - 1));
 			if (madness>0 && clownImageIndex<1) clownImageIndex = 1;
 
-			let img = clownImages[clownImageIndex];
-			let madpercent = Math.floor(madness * 100);
-			img.alt = `Picture of ${CHARACTERNAME} looking ${madpercent}% mad`;
-			img.className = "clown-image";
+			let img = getClownImage(clownImageIndex, madness);
 			document.getElementById("clown-image-container").innerHTML = "";
 			document.getElementById("clown-image-container").appendChild(img);
 		}
@@ -92,17 +94,25 @@
 			let modal = document.getElementById("myModal");
 			modal.style.display = "none";
 		}
-		function showModal(content) {
+		function showModal(content,canDismiss=true) {
 			let modal = document.getElementById("myModal");
 			let span = document.getElementById("modal-close");
 			modal.style.display = "block";
-			span.onclick = function () {
-				hideModal();
-			}
-			window.onclick = function (event) {
-				if (event.target == modal) {
+			if (canDismiss)
+			{
+				span.onclick = function () {
 					hideModal();
 				}
+				window.onclick = function (event) {
+					if (event.target == modal) {
+						hideModal();
+					}
+				}
+				span.style.display = "block";
+			}
+			else
+			{
+				span.style.display = "none";
 			}
 			let modalMessage = document.getElementById("modal-message");
 			modalMessage.innerHTML = "";
@@ -119,13 +129,19 @@
 		function stopMusic() {
 			if (!DEVMODE) audio.pause();
 		}
+		function getDifficulty()
+		{
+			return document.querySelector('input[name="difficulty"]:checked').value;
+		}
+		function setPermittedMinLogProb()
+		{
+			PERMITTEDMINLOGPROB = permittedMinLogProbs[getDifficulty()];
+		}
 		function hideMainMenu() {
 			let menu = document.getElementById("main-menu");
 			menu.style.display = "none";
 			document.getElementById("start-button-text").textContent = "Resume";
-			let difficulty = document.querySelector('input[name="difficulty"]:checked').value;
-			PERMITTEDMINLOGPROB = permittedMinLogProbs[difficulty];
-			console.log(difficulty + " PERMITTEDMINLOGPROB: " + PERMITTEDMINLOGPROB);
+			setPermittedMinLogProb();
 			updateBelievabilityDisplay(window.cy);
 			//if music is not playing and sound is on, start playing music
 			let soundOn = document.querySelector('input[name="sound"]:checked').value == "on";
@@ -145,7 +161,7 @@
 		//make cy square
 		window.addEventListener('resize', function() {
 			var cy = document.getElementById('cy');
-			console.log(cy.offsetWidth);
+			//console.log(cy.offsetWidth);
 			let maxCyHeight = window.innerHeight - 100;
 			let cySize = Math.min(cy.offsetWidth, maxCyHeight);
 			cy.style.height = cySize + 'px';
@@ -263,6 +279,17 @@
 
 		});
 
+		window.restartGameOnHardMode = function()
+		{
+			document.querySelector('input[name="difficulty"][value="hard"]').checked = true;
+			PERMITTEDMINLOGPROB = permittedMinLogProbs[getDifficulty()];
+			window.cy.nodes().forEach(function (node) {
+					node.data().predicateValue = 0;
+			});
+			updateBelievabilityDisplay(window.cy);
+			hideModal();
+		}
+
 		function verifyRestart()
 		{
 			//if game hasn't started just allow selection without further ado
@@ -277,14 +304,8 @@
 			let yesButton = document.createElement("button");
 			yesButton.className = "btn btn-primary";
 			yesButton.textContent = "Yes";
-			yesButton.onclick = function() {
-				//reset game state
-				window.cy.nodes().forEach(function (node) {
-					node.data().predicateValue = 0;
-				});
-				updateBelievabilityDisplay(window.cy);
-				hideModal();
-			}
+			yesButton.onclick = window.restartGameOnHardMode;
+			
 			let noButton = document.createElement("button");
 			noButton.className = "btn btn-primary";
 			noButton.textContent = "No";
@@ -390,7 +411,7 @@
 					<label><input type="radio" name="sound" value="off" onclick="stopMusic()">Sound off</label>
 				</div>
 				<p>
-				<button type="button" class="btn-about" onclick="about()">About</button>
+				<button type="button" class="btn-about" onclick="about()">FAQ & Credits</button>
 				</p>
 				<p>
 				<button type="button" class="btn-start" onclick="hideMainMenu()"><span id="start-button-text">Start</span></button>
