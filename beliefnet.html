@@ -33,7 +33,7 @@
 		if (window.location.protocol === 'file:') {
 			// TEST SETTINGS, CAN CHANGE
 			DEVMODE = true;
-			ALLOWIMPOSSIBLEMOVES = true;
+			ALLOWIMPOSSIBLEMOVES = false;
 		} else {
 			DEVMODE = false; //DEPLOYMENT SETTING, DO NOT CHANGE
 			ALLOWIMPOSSIBLEMOVES = false; //DO NOT CHANGE
@@ -113,6 +113,8 @@
 			else
 			{
 				span.style.display = "none";
+				span.onclick = function(){};
+				window.onclick = function(){};
 			}
 			let modalMessage = document.getElementById("modal-message");
 			modalMessage.innerHTML = "";
