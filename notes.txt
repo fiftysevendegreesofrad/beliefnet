@@ -8,11 +8,6 @@ People get confused by why they can't select a belief that has full support.
 
 TODO
 
-reconsider narrative- relative likelihood of bottom arc; magnitude of coeffs; all change anyway now i isolated reptiles?
-add credits link to end
-only final dialog shows full clown
-
-diallow further change after game end
 finish FAQ
 webpack? deployment with dependencies
 affiliate links/sponsor?

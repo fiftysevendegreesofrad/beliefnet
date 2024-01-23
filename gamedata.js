@@ -1,4 +1,4 @@
-const permittedMinLogProbs = {"easy":-8.37,"hard":-6.1}   ; //for restricting moves; derived from game analysis
+const permittedMinLogProbs = {"easy":-8.58,"hard":-6.37}   ; //for restricting moves; derived from game analysis
 const CHARACTERNAME = "Bruto";
 async function load_elements(debug=false)
 {
@@ -19,7 +19,7 @@ async function load_elements(debug=false)
     //blank line to end node
 
     let text=`
-REPTILES* 0.00000000000001: Reptilian Elite
+REPTILES* 0.000001: Reptilian Elite
 The world is governed by a secret elite of literal reptiles - actual lizard people
 The world is governed by humans
 +18.5 GOVERNMENTS
@@ -45,34 +45,33 @@ Donald Trump's primary struggle is that he is Donald Trump
 01 Conventional members of society don't believe such nonsense.
 00 Conventional members of society don't believe such nonsense.
 
-GOVERNMENTS* 0.1: Governments
-Governments are the tools of a secret evil world order
-Governments are no more competent or moral than the rest of us
-Governments can be trusted
-+5 COMPETENT 01
+GOVERNMENTS* 0.01: Governments
+Governments are merely puppets of a secret evil world order
+What we know about our government barely scratches the surface
+Governments do both good and bad things but don't have that many secrets
++1 COMPETENT 01
 11 And you have to follow the dots - who is in charge of the supressing? 
 10 Hang on, maybe the government is secretly suppressing me?
 00 No evidence for government conspiracy there.
 01 No evidence for government conspiracy there.
-+10 PHARMA 01
++2 PHARMA 01
 11 And it's likely the government is involved too.
 10 Hang on, surely the government would be involved in this?
 00 No evidence for government conspiracy there.
 01 No evidence for government conspiracy there.
-+5 EXPERTSEVIL
++1 EXPERTSEVIL
 11 And many of then are openly in the pay of the government.
 01 Never explain with conspiracy what can be explained by incompetence.
 10 Hang on, lots of those experts are paid by the government. Follow the dots...
 00 Never explain with conspiracy what can be explained by incompetence.
++5 BIRDS 01
+11 A secret world order needs its spy drones.
+10 Hang on, who are all those birds spying for?
+01 Hmm, wouldn't a secret world order needs an enormous number of secret spy drones?
 
 BIRDS* 0.000001: Birds
 All birds have been replaced with robot surveillance drones
 Birds are just birds, man, they're cool but what's the big deal?
-+5 GOVERNMENTS 01
-11 A secret world order needs its spy drones.
-00 But pigeons shit on statues of politicians anyway.
-10 Hang on, the government must be involved in this!
-01 And they have never mentioned bird drones.
 +5 FIVEG 01
 11 The masts are also used to control the bird drones
 10 Hang on, couldn't those masts also be remote controls for something?
