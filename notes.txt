@@ -9,6 +9,7 @@ People get confused by why they can't select a belief that has full support.
 TODO
 
 finish FAQ
+better background?
 webpack? deployment with dependencies
 affiliate links/sponsor?
 make new nodes appear just under last one
