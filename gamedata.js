@@ -261,7 +261,7 @@ Most experts are trying to get things right
 11 And let me tell you about these so-called experts.
 +3 QANON 01
 11 Only the Donald can save us from the so-called experts.
-10 Hang on, I be the experts are in on it too.
+10 Hang on, I bet the experts are in on it too.
 
 `
     let lines = text.split("\n");
