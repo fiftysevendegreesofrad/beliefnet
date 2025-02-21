@@ -29,8 +29,8 @@ The world is governed by humans
 00 ...and they haven't said anything about lizard people.
 
 QANON* 0.001: QAnon
-Donald Trump's primary struggle is to fight against Satan worshipping cannibals
-Donald Trump's primary struggle is that he is Donald Trump
+Donald Trump's primary aim is to expose and defeat a secret cabal of Satan-worshippers controlling the government
+Donald Trump's primary aim is to implement his "America First" agenda
 +5 CHEMTRAILS 01
 11 If chemtrails are a thing, these guys are the number one suspects for being behind them.
 10 Hang on, if chemtrails are a thing, these guys are the number one suspects for being behind them.
@@ -261,7 +261,7 @@ Most experts are trying to get things right
 11 And let me tell you about these so-called experts.
 +3 QANON 01
 11 Only the Donald can save us from the so-called experts.
-10 Hang on, I be the experts are in on it too.
+10 Hang on, I bet the experts are in on it too.
 
 `
     let lines = text.split("\n");
