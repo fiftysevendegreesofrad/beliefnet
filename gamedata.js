@@ -28,17 +28,17 @@ The world is governed by humans
 10 ...which could even be run by lizards too.
 00 ...and they haven't said anything about lizard people.
 
-QANON* 0.001: QAnon
-Donald Trump's primary aim is to expose and defeat a secret cabal of Satan-worshippers controlling the government
-Donald Trump's primary aim is to implement his "America First" agenda
+LEADER* 0.001: Leader
+Out fearless leader’s primary aim is to expose and defeat a secret cabal of Satan-worshippers controlling the government
+Our national leader’s primary aim is to deliver on his election promises (minus the usual u-turns and broken pledges)
 +5 CHEMTRAILS 01
 11 If chemtrails are a thing, these guys are the number one suspects for being behind them.
 10 Hang on, if chemtrails are a thing, these guys are the number one suspects for being behind them.
 +10 GOVERNMENTS
-11 ...which could well be QAnon.
-01 ...and they are pretty clear about QAnon being nonsense.
-10 ...which could well be QAnon.
-00 ...and they are pretty clear about QAnon being nonsense.
+11 ...probably this secret cabal.
+01 ...and they are pretty clear that these ideas are nonsense.
+10 ...probably this secret cabal.
+00 ...and they are pretty clear that these ideas are nonsense.
 +3 OUTSIDER
 11 Bruto is more likely to believe wacky shit if he identifies as an outsider.
 10 Bruto is more likely to believe wacky shit if he identifies as an outsider.
@@ -196,7 +196,7 @@ I'm secure in my friendships as a conventional member of society
 10 Come to think of it, why am I friends with these people?
 01 The world has room for me to be a little bit different.
 00 Not that we have any differences, really.
-+1 QANON
++1 LEADER
 11 My friends don't think that.
 10 My friends don't think that.
 01 My friends would agree.
@@ -259,8 +259,8 @@ Most experts are trying to get things right
 01 And they seem like decent people. Maybe I should reconsider.
 10 And man, there are some YouTube videos on these so-called experts.
 11 And let me tell you about these so-called experts.
-+3 QANON 01
-11 Only the Donald can save us from the so-called experts.
++3 LEADER 01
+11 Only our fearless leader can save us from the so-called experts.
 10 Hang on, I bet the experts are in on it too.
 
 `
