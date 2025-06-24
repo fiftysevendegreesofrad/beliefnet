@@ -146,6 +146,9 @@
 			setPermittedMinLogProb();
 			updateBelievabilityDisplay(window.cy);
 			//if music is not playing and sound is on, start playing music
+			document.body.style.overflow = 'hidden';
+			window.scrollTo(0, 0);
+
 			let soundOn = document.querySelector('input[name="sound"]:checked').value == "on";
 			if (soundOn) startOrResumeMusic();
 		}
