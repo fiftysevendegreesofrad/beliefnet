@@ -7,10 +7,11 @@ function hideNodeDisplay(callback) {
         callback();
         nodeDisplay.style.display = "none";
         document.body.style.overflow = "auto";
-    },{once:true});
+    }, { once: true });
     document.body.style.overflow = "hidden";
     nodeDisplay.classList.remove("on-screen");
 }
+
 function hideNodeDetailsUpdateGraphDisplay(cy) {
     hideNodeDisplay(()=>updateGraphDisplay(cy));
 }
