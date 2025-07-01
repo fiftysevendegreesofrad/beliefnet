@@ -145,6 +145,8 @@
 			document.getElementById("start-button-text").textContent = "Resume";
 			setPermittedMinLogProb();
 			updateBelievabilityDisplay(window.cy);
+			document.body.style.overflow = 'hidden';
+			window.scrollTo(0, 0);
 			//if music is not playing and sound is on, start playing music
 			let soundOn = document.querySelector('input[name="sound"]:checked').value == "on";
 			if (soundOn) startOrResumeMusic();
