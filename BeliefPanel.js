@@ -5,10 +5,7 @@ function hideNodeDisplay(callback) {
     let nodeDisplay = document.getElementById("node-display");
     nodeDisplay.addEventListener('transitionend', function() {
         callback();
-        nodeDisplay.style.display = "none";
-        document.body.style.overflow = "auto";
     }, { once: true });
-    document.body.style.overflow = "hidden";
     nodeDisplay.classList.remove("on-screen");
 }
 

@@ -60,7 +60,6 @@
     transform: translateX(-50%) translateY(100%);
     transition: all 0.5s ease-in-out;
     height: calc(100vh - 50px); 
-    /* scroll if overflow */
     overflow-y: auto;
 }
 
@@ -118,6 +117,7 @@
 
 body {
     font-family: helvetica;
+    overflow: hidden;
 }
 
 #cy {
@@ -129,7 +129,6 @@ body {
     align-items: center;
     padding: 0 10px;
     box-sizing: border-box;
-    overflow: visible;
     position: relative;
 }
 
