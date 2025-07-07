@@ -23,6 +23,7 @@ function showHideAtStartClass() {
 function displayNodeDetails(node)
 {
     updateNodeDetails(node);
+    preventCloseWindow();
     let nodeDisplay = document.getElementById("node-display");
     nodeDisplay.style.display = "block";
     nodeDisplay.classList.add("on-screen");
@@ -113,6 +114,7 @@ function updateNodeDetails(node) {
                     animateNodeDetailsChange(node);
                     if (isTargetOption)
                     {
+                        allowCloseWindow();
                         let div = document.createElement("div");
                         div.appendChild(getClownImage());
                         if (getDifficulty() == "easy")

@@ -191,6 +191,18 @@
 				cy.style().selector('node').style('font-size', endFontSize + 'px').update();
 			});
 		}
+		function preventCloseWindow()
+		{
+			window.onbeforeunload = function(event) {
+					event.preventDefault(); //prevent closing the window
+					event.returnValue = ''; //some browsers require this to show a confirmation dialog
+					return ''; //returning a string shows a confirmation dialog in some browsers
+			};
+		}
+		function allowCloseWindow()
+		{
+			window.onbeforeunload = null; //allow closing the window
+		}
 		document.addEventListener('DOMContentLoaded', async function () {
 			window.dispatchEvent(new Event('resize')); //trigger first time resize to make cy square
 
