@@ -36,7 +36,7 @@ function updateNodeDetails(node) {
         hideNodeDetailsUpdateGraphDisplay(cy);
     }
 
-    document.getElementById("topic").innerHTML = node.data("displaylabel");
+    document.getElementById("topic").innerHTML = node.data("displayLabelSingleLine");
     let options = node.data().options;
     let whichSelected = predicateToIndex(node);
     let predicateValue = node.data("predicateValue");

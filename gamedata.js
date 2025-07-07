@@ -164,7 +164,7 @@ Homeopathy is indistinguishable from placebo, we're done here
 01 And they're pretty clear that homeopathic remedies are just sugar pills.
 00 And they're pretty clear that homeopathic remedies are just sugar pills.
 
-COMPETENT* 0.5: I Got Fired 
+COMPETENT* 0.5: I_Got Fired 
 I got fired because the elite are trying to suppress me 
 I got fired because my manager was incompetent
 I got fired because I am incompetent 
@@ -278,6 +278,8 @@ Most experts are trying to get things right
         let nodeLabel = leftparts[0].trim();
         let baseProb = parseFloat(leftparts[1]);
         let userLabel = parts[1].trim();
+        let userLabelSingleLine = userLabel.replace(/_/g, " ");
+        let userLabelMultiLine = userLabel.replace(/ /g, "\n").replace(/_/g, " ");
 
         let wacky = nodeLabel[nodeLabel.length-1]=="*";
         if (wacky)
@@ -295,7 +297,7 @@ Most experts are trying to get things right
             options.push(line);
             line = lines.shift();
         }
-        elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabel, baseProb: baseProb, options: options,
+        elements.nodes.push({data: {id: nodeLabel, label: userLabel, displaylabel: userLabelMultiLine, displayLabelSingleLine: userLabelSingleLine, baseProb: baseProb, options: options,
             predicateValue: 0, logprob: 0, researched: 0, wacky: wacky, target: false}});
 
         //now we are expecting edges

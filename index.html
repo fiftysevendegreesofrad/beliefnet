@@ -41,6 +41,7 @@
 		let nodeDisplay = DEVMODE ? "element" : "none";
 
 		let allowClickNodes = true;
+		let cyBaseFontSize;
 
 		//get clown images clown1.jpg through to clown7.jpg in an array
 		const NUMCLOWNIMAGES = 7;
@@ -178,12 +179,17 @@
 				name: 'avsdf',
 				nodeSeparation: 120,
 				animate: "end",
-				animationDuration: 1000,
+				animationDuration: 2000,
 				animationEasing: 'ease-in-out',
 				nodeSeparation: 120,
 				eles: visibleNodes
 			};
-			cy.layout(layoutOptions).run();
+			let layout = cy.layout(layoutOptions);
+			layout.run();
+			let endFontSize = visibleNodes.length > 3 ? cyBaseFontSize*19/15 : cyBaseFontSize;
+			layout.promiseOn('layoutstop').then(() => {
+				cy.style().selector('node').style('font-size', endFontSize + 'px').update();
+			});
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
 			window.dispatchEvent(new Event('resize')); //trigger first time resize to make cy square
@@ -196,10 +202,10 @@
 			let maxweight = elements.edges.map(x => x.data.absweight).reduce((a, b) => Math.max(a, b));
 
 			let mediaQuery = window.matchMedia("(max-width: 600px)");
-			let cyFontSize;
+			
 			function setCyFontSizeFromMedia(m)
 			{
-				cyFontSize = m.matches ? 19 : 12;
+				cyBaseFontSize = m.matches ? 15 : 12;
 			}
 			setCyFontSizeFromMedia(mediaQuery); //set once at start
 			
@@ -211,6 +217,7 @@
 						selector: 'node',
 						style: {
 							'label': 'data(displaylabel)',
+							'text-wrap': 'wrap',
 							'text-valign': 'center',
 							'color': '#000000',
 							'width': 'mapData(logprob,-3,0,60,20)',
@@ -220,7 +227,7 @@
 							'pie-2-background-color': 'mapData(predicateValue, 0, 1, #aaaaff, #ffaaff)',
 							'pie-2-background-size': 'mapData(baseProb,0,1,100,0)',
 							'display': nodeDisplay,
-							'font-size': cyFontSize+"px"
+							'font-size': cyBaseFontSize+"px"
 						}
 					},
 					{
