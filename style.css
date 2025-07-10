@@ -13,6 +13,9 @@
     display: flex;
     align-items: center;
 }
+#progress-bar-container.hidden {
+    display: none;
+}
 
 .hamburger-menu {
     display: flex;

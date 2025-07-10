@@ -111,6 +111,7 @@ function updateNodeDetails(node) {
             if (possible) {
 
                 button.addEventListener("click", function (evt1) {
+                    document.getElementById("progress-bar-container").classList.remove("hidden");
                     node.data("predicateValue", buttonPredValue);
                     updateBelievabilityDisplay(cy);
                     animateNodeDetailsChange(node);
