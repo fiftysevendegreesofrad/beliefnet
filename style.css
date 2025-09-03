@@ -293,7 +293,7 @@ button {
 .paper-bg {
     background-color: #f8f8f8; /* Light grey background to simulate paper */
     background-image: 
-        linear-gradient(#ffeddb 11.34px, rgb(228, 228, 228) 11.34px); /* Horizontal lines to simulate rows */
+        linear-gradient( rgb(250, 225, 197) 11.34px, rgb(235, 235, 235) 11.34px); /* Horizontal lines to simulate rows */
     background-size: 
         100% 22.68px; /* Size of horizontal lines */
 }
