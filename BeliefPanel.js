@@ -120,9 +120,9 @@ function updateNodeDetails(node) {
                     {
                         allowCloseWindow();
                         let div = document.createElement("div");
-                        div.appendChild(getClownImage());
                         if (getDifficulty() == "easy")
                         {
+                            div.appendChild(getClownImage());
                             div.innerHTML += `<h1>Well done!</h1>
                             <h2>You convinced ${CHARACTERNAME} of the reptilian elite.</h2>
                             <p>${CHARACTERNAME} (set to easy mode) sits around doomscrolling all day, his isolation making him gullible. So although you've convinced him, this doesn't change much as he hardly leaves his couch.</p>
@@ -131,7 +131,8 @@ function updateNodeDetails(node) {
                         }
                         else
                         {
-                            div.innerHTML += `<h1>Well done!</h1><h2>
+                            div.innerHTML += `<img src="img/completion_image.webp" style="max-width:100%;height:auto"/>
+                            <h1>Well done!</h1><h2>
                             <h2>You completed the game on hard mode.</h2>
                             <p>Convinced that we are governed by reptiles, ${CHARACTERNAME} goes out one day and attacks a zookeeper.</p>
                             <p>I hope you're proud of yourself.</p>`;
