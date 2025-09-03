@@ -116,6 +116,13 @@
 				document.getElementById("moving-text").textContent += " " + logLik.toFixed(2);
 			cy.resize();
 		}
+		function hideNodeDisplay(callback) {
+			let nodeDisplay = document.getElementById("node-display");
+			nodeDisplay.addEventListener('transitionend', function() {
+				callback();
+			}, { once: true });
+			nodeDisplay.classList.remove("on-screen");
+		}
 		function hideModal() {
 			let modal = document.getElementById("myModal");
 			modal.style.display = "none";
@@ -337,6 +344,7 @@
 			});
 			updateBelievabilityDisplay(window.cy);
 			hideModal();
+			hideNodeDisplay(()=>{});
 		}
 
 		function verifyRestart()
