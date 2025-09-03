@@ -51,6 +51,7 @@ function updateNodeDetails(node) {
         let button = document.createElement("button");
         button.innerHTML = "Research Influencing Beliefs";
         button.addEventListener("click", function (evt1) {
+            log("RES "+node.id());
             node.data("researched", 1);
             //iterate through neighbouring nodes
             for (e of node.incomers())
@@ -110,6 +111,7 @@ function updateNodeDetails(node) {
             if (possible) {
 
                 button.addEventListener("click", function (evt1) {
+                    log("INFYES "+node.id()+"="+buttonPredValue+" "+getDifficulty());
                     showBullshitometer();
                     node.data("predicateValue", buttonPredValue);
                     updateBelievabilityDisplay(cy);
@@ -143,6 +145,7 @@ function updateNodeDetails(node) {
             }
             else {
                 button.addEventListener("click", function (evt1) {
+                    log("INFNO "+node.id()+"="+buttonPredValue+" "+getDifficulty());
                     showBullshitometer();
 
                     let div = document.createElement("div");

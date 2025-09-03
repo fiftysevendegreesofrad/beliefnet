@@ -52,6 +52,31 @@
 			clownImages.push(img);
 		}
 
+		//logging
+		const DB_URL = 'https://beliefnet-24eef-default-rtdb.europe-west1.firebasedatabase.app/logs.json';
+		const CLIENT_ID_KEY = 'clientRandomId';
+		function getClientId() {
+			let id = localStorage.getItem(CLIENT_ID_KEY);
+			if (!id) {
+				id = Math.random().toString(36).slice(2);
+				localStorage.setItem(CLIENT_ID_KEY, id);
+			}
+			return id;
+		}
+		const clientId = getClientId();
+		function log(message) {
+			const payload = {
+				clientId,
+				msg: message,
+				ts: { ".sv": "timestamp" }
+			};
+			fetch(DB_URL, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+		}
+
 		function getClownImage(clownImageIndex=NUMCLOWNIMAGES-1, madness=1) {
 			let img = clownImages[clownImageIndex];
 			let madpercent = Math.floor(madness * 100);
@@ -204,6 +229,7 @@
 			window.onbeforeunload = null; //allow closing the window
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
+			log("page load start "+window.location.href);
 			window.dispatchEvent(new Event('resize')); //trigger first time resize to make cy square
 
 			document.querySelectorAll('.CharacterName').forEach(function (element) {
@@ -299,7 +325,7 @@
 				if (allowClickNodes)
 					displayNodeDetails(node);
 			});
-
+			log("page load complete");
 		});
 
 		window.restartGameOnHardMode = function()
@@ -344,6 +370,7 @@
 
 		function about()
 		{
+			log("about");
 			window.open('about.html', '_blank');
 		}
 	</script>
