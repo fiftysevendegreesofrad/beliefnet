@@ -29,6 +29,9 @@ function displayNodeDetails(node)
     nodeDisplay.classList.add("on-screen");
     setTimeout(showHideAtStartClass, 1000);
 }
+function showBullshitometer() {
+    document.getElementById("progress-bar-container").classList.remove("hidden");
+}
 function updateNodeDetails(node) {
     updateClownImage(cy);
     
@@ -109,7 +112,7 @@ function updateNodeDetails(node) {
             if (possible) {
 
                 button.addEventListener("click", function (evt1) {
-                    document.getElementById("progress-bar-container").classList.remove("hidden");
+                    showBullshitometer();
                     node.data("predicateValue", buttonPredValue);
                     updateBelievabilityDisplay(cy);
                     animateNodeDetailsChange(node);
@@ -141,6 +144,8 @@ function updateNodeDetails(node) {
             }
             else {
                 button.addEventListener("click", function (evt1) {
+                    showBullshitometer();
+
                     let div = document.createElement("div");
                     let message = `<h2>You can't convince ${CHARACTERNAME} of this. 
                                        His bullshitometer would climb above 100%.</h2>
