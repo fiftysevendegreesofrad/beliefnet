@@ -1,11 +1,5 @@
 
-function hideNodeDisplay(callback) {
-    let nodeDisplay = document.getElementById("node-display");
-    nodeDisplay.addEventListener('transitionend', function() {
-        callback();
-    }, { once: true });
-    nodeDisplay.classList.remove("on-screen");
-}
+
 
 function hideNodeDetailsUpdateGraphDisplay(cy) {
     hideNodeDisplay(()=>updateGraphDisplay(cy));
