@@ -1,6 +1,4 @@
-function animateNodeDetailsChange(node) {
-    hideNodeDisplay(()=>{updateGraphDisplay(cy);displayNodeDetails(node);});
-}
+
 function hideNodeDisplay(callback) {
     let nodeDisplay = document.getElementById("node-display");
     nodeDisplay.addEventListener('transitionend', function() {
@@ -115,7 +113,7 @@ function updateNodeDetails(node) {
                     showBullshitometer();
                     node.data("predicateValue", buttonPredValue);
                     updateBelievabilityDisplay(cy);
-                    animateNodeDetailsChange(node);
+                    hideNodeDetailsUpdateGraphDisplay(cy);
                     if (isTargetOption)
                     {
                         allowCloseWindow();
