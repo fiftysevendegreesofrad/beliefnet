@@ -56,12 +56,14 @@
 		const DB_URL = 'https://beliefnet-24eef-default-rtdb.europe-west1.firebasedatabase.app/logs.json';
 		const CLIENT_ID_KEY = 'clientRandomId';
 		function getClientId() {
-			let id = localStorage.getItem(CLIENT_ID_KEY);
-			if (!id) {
-				id = Math.random().toString(36).slice(2);
-				localStorage.setItem(CLIENT_ID_KEY, id);
-			}
-			return id;
+			try {
+				let id = localStorage.getItem(CLIENT_ID_KEY);
+				if (!id) {
+					id = Math.random().toString(36).slice(2);
+					localStorage.setItem(CLIENT_ID_KEY, id);
+				}
+				return id;
+			} catch(e) { return "unknown"; }
 		}
 		const clientId = getClientId();
 		function log(message) {
