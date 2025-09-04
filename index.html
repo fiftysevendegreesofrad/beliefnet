@@ -236,7 +236,7 @@
 			window.onbeforeunload = null; //allow closing the window
 		}
 		document.addEventListener('DOMContentLoaded', async function () {
-			log("page load start "+window.location.href);
+			log("ARR "+window.location.href);
 			window.dispatchEvent(new Event('resize')); //trigger first time resize to make cy square
 
 			document.querySelectorAll('.CharacterName').forEach(function (element) {
@@ -332,7 +332,7 @@
 				if (allowClickNodes)
 					displayNodeDetails(node);
 			});
-			log("page load complete");
+			log("LOADED");
 		});
 
 		window.restartGameOnHardMode = function()
