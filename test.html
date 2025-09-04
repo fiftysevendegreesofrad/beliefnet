@@ -1,51 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Split Screen Example</title>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  <script src="gamedata.js"></script>
+  <title>Pulsing Button</title>
   <style>
-    /* Set height of the header */
-    .header {
-      height: 50px;
-      background-color: #f1f1f1;
-      text-align: center;
-      line-height: 50px;
+    .pulse-button {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #3498db;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+      transition: background-color 0.3s ease-in-out;
     }
 
-    /* Set height of the left panel */
-    .left-panel {
-      height: 500px;
-      background-color: #aaa;
-    }
-
-    /* Set height of the right panel */
-    .right-panel {
-      height: 500px;
-      background-color: #bbb;
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        background-color: #3498db;
+      }
+      50% {
+        transform: scale(1.05);
+        background-color: #e74c3c; /* red flash */
+      }
+      100% {
+        transform: scale(1);
+        background-color: #3498db;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <h2>Header</h2>
-  </div>
-
-  <!-- Panels -->
-  <div class="row">
-    <div class="col-sm-6 left-panel">
-      <h3>Left Panel</h3>
-    </div>
-    <div class="col-sm-6 right-panel">
-      <h3>Right Panel</h3>
-    </div>
-  </div>
+  <button class="pulse-button">Click Me</button>
 
 </body>
 </html>
