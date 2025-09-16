@@ -51,6 +51,9 @@
 			img.src = "img/clown" + i + ".jpg";
 			clownImages.push(img);
 		}
+		//preload completion image
+		let completionImage = new Image();
+		completionImage.src = "img/completion_image.webp";
 
 		//logging
 		const DB_URL = 'https://beliefnet-24eef-default-rtdb.europe-west1.firebasedatabase.app/logs.json';
