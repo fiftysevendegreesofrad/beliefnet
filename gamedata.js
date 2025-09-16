@@ -29,15 +29,15 @@ The world is governed by humans
 00 ...and they haven't said anything about lizard people.
 
 LEADER* 0.001: Leader
-Out fearless leader’s primary aim is to expose and defeat a secret cabal of Satan-worshippers controlling the government
-Our national leader’s primary aim is to deliver on his election promises (minus the usual u-turns and broken pledges)
+Our national leader’s primary aim is to expose and defeat a secret cult controlling the government
+Our national leader’s primary aim is to deliver on some of their election promises (minus the usual u-turns) and win the next one
 +5 CHEMTRAILS 01
 11 If chemtrails are a thing, these guys are the number one suspects for being behind them.
 10 Hang on, if chemtrails are a thing, these guys are the number one suspects for being behind them.
 +10 GOVERNMENTS
-11 ...probably this secret cabal.
+11 ...probably this secret cult.
 01 ...and they are pretty clear that these ideas are nonsense.
-10 ...probably this secret cabal.
+10 ...probably this secret cult.
 00 ...and they are pretty clear that these ideas are nonsense.
 +3 OUTSIDER
 11 Bruto is more likely to believe wacky shit if he identifies as an outsider.
